@@ -29,7 +29,6 @@ export interface Finding {
   scoreImpact: number;
   evidence: Evidence[];
   positive?: boolean;
-  /** Actionable guidance for critical/high findings (engine or id-mapped). */
   recommendation?: string;
 }
 
@@ -40,7 +39,6 @@ export interface CategoryScore {
   summary: string;
 }
 
-/** Recent wallet tx row when provider/demo fixtures supply history. */
 export interface WalletActivityItem {
   date: string;
   amount?: string | null;
@@ -53,7 +51,6 @@ export interface WalletActivityItem {
   method?: string | null;
 }
 
-/** Subject header fields for token/contract results — only when present in provider data. */
 export interface SubjectMeta {
   name?: string | null;
   symbol?: string | null;
@@ -71,8 +68,7 @@ export interface ScanResult {
   inputType: InputType;
   chain: string;
   demo: boolean;
-  /** Deterministic engine formula version. Bump when weights/inputs change. */
-  engineVersion?: string;
+  engineVersion: string;
   score: number;
   band: RiskBand;
   categories: CategoryScore[];
@@ -83,9 +79,7 @@ export interface ScanResult {
   dataSources: string[];
   disclaimer: string;
   insufficientData?: boolean;
-  /** Wallet activity timeline when available from provider/demo. */
   activity?: WalletActivityItem[];
-  /** Token/contract header metadata when available (never invent facts). */
   subject?: SubjectMeta;
   txMeta?: {
     from?: string | null;
@@ -102,17 +96,14 @@ export interface ScanResult {
     balanceEth?: number | null;
     labels?: string[];
   };
-  /** Structured ERC-20 approvals when evaluated (null/omit = not evaluated). */
   approvals?: TokenApproval[] | null;
   holdings?: WalletHolding[] | null;
-  /** Tx simulation when run; null = not run */
   simulation?: TxSimulation | null;
 }
 
 export interface TokenApproval {
   token: string;
   spender: string;
-  /** Human-readable allowance when known; null = Insufficient data — never invent 0/unlimited */
   allowance: string | null;
   allowanceRaw?: string | null;
   unlimited: boolean;
@@ -126,7 +117,6 @@ export interface WalletHolding {
   token: string;
   symbol?: string | null;
   decimals?: number | null;
-  /** Human-readable balance when known; omit/null when unknown — never invent balances */
   balance: string | null;
   balanceRaw?: string | null;
   evidence: Evidence[];
@@ -143,17 +133,11 @@ export interface WalletData {
   labels?: string[];
   interactions?: Array<{ address: string; label?: string; risk?: string }>;
   fundingSource?: { address: string; label?: string; risk?: string } | null;
-  /** true/false only when detected; null = not evaluated (never invent false-clean) */
   rapidMovement?: boolean | null;
-  /** count when computed; null = not evaluated */
   newContractInteractions?: number | null;
-  /** true/false only when detected; null = not evaluated (never invent false-clean) */
   mixerExposure?: boolean | null;
-  /** Recent activity rows when tx history is available. */
   activity?: WalletActivityItem[];
-  /** null = not evaluated; [] = evaluated empty only when provider truly returned empty */
   approvals?: TokenApproval[] | null;
-  /** null = not evaluated; [] = evaluated empty only when provider truly returned empty */
   holdings?: WalletHolding[] | null;
   demo?: boolean;
   sources: string[];
@@ -170,7 +154,6 @@ export interface ContractData {
   isProxy?: boolean | null;
   implementation?: string | null;
   owner?: string | null;
-  /** Deployer/creator when known from provider — never invented. */
   deployer?: string | null;
   abi?: unknown[] | null;
   sourceCode?: string | null;
@@ -203,7 +186,6 @@ export interface TransactionData {
   status?: string | null;
   method?: string | null;
   interactsWithContract?: boolean;
-  /** Attached simulation result when evaluated */
   simulation?: TxSimulation | null;
   demo?: boolean;
   sources: string[];
@@ -218,17 +200,13 @@ export interface MarketData {
 }
 
 export interface SecurityIntel {
-  /** true = confirmed hit; false = confirmed clear; null = vendor data unavailable */
   sanctionsHit?: boolean | null;
-  /** report count when known; null = vendor data unavailable (never invent 0) */
   phishingReports?: number | null;
-  /** true = confirmed malicious; false = confirmed clear; null = vendor data unavailable */
   knownMalicious?: boolean | null;
   notes?: string[];
   demo?: boolean;
   sources: string[];
 }
-
 
 export type SimulationStepStatus = "ok" | "revert" | "unknown";
 
@@ -248,7 +226,6 @@ export interface AssetDelta {
   token: string;
   symbol?: string | null;
   direction: "in" | "out" | "unknown";
-  /** null = Insufficient data — never invent amounts */
   amount: string | null;
   amountRaw?: string | null;
   evidence: Evidence[];
@@ -260,7 +237,6 @@ export interface ApprovalDelta {
   token: string;
   spender: string;
   change: "grant" | "revoke" | "change" | "unknown";
-  /** null = Insufficient data — never invent allowance */
   allowanceAfter: string | null;
   unlimited?: boolean;
   evidence: Evidence[];
@@ -272,11 +248,9 @@ export type TxSimulationStatus = "simulated" | "insufficient_data" | "unavailabl
 
 export interface TxSimulation {
   status: TxSimulationStatus;
-  /** null = not evaluated; [] = evaluated empty */
   steps: SimulationStep[] | null;
   assetDeltas: AssetDelta[] | null;
   approvalDeltas: ApprovalDelta[] | null;
-  /** null = not estimated — never invent gas */
   gasUsedEstimate: string | null;
   revertReason: string | null;
   evidence: Evidence[];

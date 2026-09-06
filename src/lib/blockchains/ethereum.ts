@@ -126,9 +126,10 @@ export async function getEthereumWallet(address: string): Promise<WalletData> {
     balanceEth,
     interactions: [],
     fundingSource: null,
-    rapidMovement: false,
-    newContractInteractions: 0,
-    mixerExposure: false,
+    // Threat heuristics not derived from txlist alone — null = unknown, not clean
+    rapidMovement: null,
+    newContractInteractions: null,
+    mixerExposure: null,
     activity,
     demo: false,
     sources: ["etherscan"],

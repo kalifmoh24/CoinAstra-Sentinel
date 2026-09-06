@@ -1,8 +1,25 @@
 import type { Finding } from "../types";
 
+/** Privilege / dangerous-permission finding ids shown in the dedicated panel. */
+export const DANGEROUS_PERMISSION_IDS = new Set([
+  "abi-mint",
+  "abi-pause",
+  "abi-blacklist",
+  "abi-selfdestruct",
+  "abi-fee-controls",
+  "contract-proxy",
+  "has-owner",
+  "abi-ownership-transfer",
+]);
+
+export function isDangerousPermissionFinding(f: Finding): boolean {
+  return DANGEROUS_PERMISSION_IDS.has(f.id);
+}
+
 /**
  * Deterministic recommendations keyed by finding id.
- * Applied for critical/high findings when the engine did not set recommendation.
+ * Applied for critical/high findings, and for all dangerous-permission findings,
+ * when the engine did not set recommendation.
  */
 const BY_ID: Record<string, string> = {
   "wallet-mixer":
@@ -35,6 +52,10 @@ const BY_ID: Record<string, string> = {
     "Review max fee bounds and who can change them before swapping or providing liquidity.",
   "contract-proxy":
     "Inspect the current implementation and admin/upgrade keys; upgradeable logic can change without a new address.",
+  "has-owner":
+    "Identify the owner/admin key and whether it is multisig or timelocked before trusting privileged actions.",
+  "abi-ownership-transfer":
+    "Ownership can move — confirm current owner after any transfer and treat admin changes as a trust reset.",
   honeypot:
     "Do not buy or approve. Honeypot heuristics suggest sells/transfers may fail for holders.",
   "low-liquidity":
@@ -60,31 +81,16 @@ const CATEGORY_FALLBACK: Partial<Record<Finding["category"], string>> = {
 
 export function recommendationForFinding(f: Finding): string | undefined {
   if (f.recommendation) return f.recommendation;
-  if (f.severity !== "critical" && f.severity !== "high") return undefined;
-  return BY_ID[f.id] ?? CATEGORY_FALLBACK[f.category];
+  const isDangerous = DANGEROUS_PERMISSION_IDS.has(f.id);
+  if (!isDangerous && f.severity !== "critical" && f.severity !== "high") return undefined;
+  return BY_ID[f.id] ?? (isDangerous ? CATEGORY_FALLBACK.Ownership : CATEGORY_FALLBACK[f.category]);
 }
 
-/** Attach recommendations onto critical/high findings (mutates copies). */
+/** Attach recommendations onto critical/high + dangerous-permission findings. */
 export function withRecommendations(findings: Finding[]): Finding[] {
   return findings.map((f) => {
     const recommendation = recommendationForFinding(f);
     if (!recommendation || f.recommendation === recommendation) return f;
     return { ...f, recommendation };
   });
-}
-
-/** Privilege / dangerous-permission finding ids shown in the dedicated panel. */
-export const DANGEROUS_PERMISSION_IDS = new Set([
-  "abi-mint",
-  "abi-pause",
-  "abi-blacklist",
-  "abi-selfdestruct",
-  "abi-fee-controls",
-  "contract-proxy",
-  "has-owner",
-  "abi-ownership-transfer",
-]);
-
-export function isDangerousPermissionFinding(f: Finding): boolean {
-  return DANGEROUS_PERMISSION_IDS.has(f.id);
 }

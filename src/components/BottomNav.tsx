@@ -18,7 +18,7 @@ export function BottomNav() {
     <nav
       aria-label="Primary"
       className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-ink-950/95 backdrop-blur-xl sm:hidden"
-      style={{ paddingBottom: "max(0.35rem, env(safe-area-inset-bottom))" }}
+      style={{ paddingBottom: "max(0.35rem, env(safe-area-inset-bottom, 0px))" }}
     >
       <ul className="mx-auto flex max-w-lg items-stretch justify-between px-1 pt-1">
         {ITEMS.map((item) => {
@@ -30,7 +30,7 @@ export function BottomNav() {
             <li key={item.href} className="flex-1">
               <Link
                 href={item.href}
-                className={`flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-[10px] font-medium transition ${
+                className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-1.5 text-[10px] font-medium transition ${
                   active ? "text-accent-cyan" : "text-slate-500 hover:text-slate-300"
                 }`}
               >

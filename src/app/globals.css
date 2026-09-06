@@ -10,6 +10,7 @@ html,
 body {
   min-height: 100%;
   min-height: 100dvh;
+  overflow-x: hidden;
 }
 
 body {
@@ -26,6 +27,11 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  .break-evidence {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
 }
 
 @keyframes pulse-step {
@@ -41,5 +47,26 @@ body {
 @media (hover: none) and (pointer: coarse) {
   a, button {
     -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Sticky scan CTA: leave room for BottomNav + home indicator on short viewports */
+.sentinel-sticky-cta {
+  position: fixed;
+  inset-inline: 0;
+  bottom: calc(3.75rem + env(safe-area-inset-bottom, 0px));
+  z-index: 30;
+  max-height: min(28vh, 7.5rem);
+  padding: 0.75rem;
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(5, 7, 13, 0.95);
+  backdrop-filter: blur(16px);
+}
+
+@supports (height: 100dvh) {
+  .sentinel-sticky-cta {
+    /* Prefer not to cover more than ~28% of the visible viewport on short phones */
+    max-height: min(28dvh, 7.5rem);
   }
 }

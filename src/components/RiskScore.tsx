@@ -18,6 +18,10 @@ export function RiskScore({
           <p className="text-xs uppercase tracking-wider text-slate-400">Risk score</p>
           <p className={`mt-1 text-5xl font-semibold tabular-nums ${bandColor(band)}`}>{score}</p>
           <p className={`mt-1 text-lg font-medium ${bandColor(band)}`}>{band}</p>
+          <p className="mt-2 max-w-sm text-xs leading-relaxed text-slate-400">
+            Assessment based on available evidence — not a guarantee, and not financial or
+            security advice.
+          </p>
         </div>
         <div className="text-right">
           {demo && (

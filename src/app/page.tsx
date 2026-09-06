@@ -8,7 +8,7 @@ export default function HomePage() {
     <>
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 bg-grid-fade bg-grid opacity-40" />
-        <div className="relative mx-auto max-w-6xl px-4 pb-8 pt-12 sm:px-6 sm:pt-24">
+        <div className="relative mx-auto max-w-6xl overflow-x-hidden px-4 pb-28 pt-12 sm:px-6 sm:pb-8 sm:pt-24">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-sm font-medium text-accent-cyan">
               The security intelligence layer for crypto.

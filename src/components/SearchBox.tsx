@@ -83,7 +83,7 @@ export function SearchBox({ stickyCta = false }: { stickyCta?: boolean }) {
       </p>
 
       {stickyCta && (
-        <div className="fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] z-30 border-t border-white/10 bg-ink-950/95 p-3 backdrop-blur-xl sm:hidden">
+        <div className="sentinel-sticky-cta sm:hidden">
           <div className="mx-auto max-w-lg px-1">{submitBtn}</div>
         </div>
       )}

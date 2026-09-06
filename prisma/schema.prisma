@@ -1,0 +1,37 @@
+// CoinAstra Sentinel — Prisma schema
+// Uses Postgres when DATABASE_URL is a postgres URL; SQLite file fallback for local/demo.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Scan {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  input         String
+  inputType     String
+  chain         String   @default("ethereum")
+  demo          Boolean  @default(false)
+  score         Int
+  band          String
+  summaryJson   String
+  resultJson    String
+  clientIp      String?
+  userAgent     String?
+}
+
+model RateLimitBucket {
+  id        String   @id @default(cuid())
+  key       String
+  day       String
+  count     Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@unique([key, day])
+}

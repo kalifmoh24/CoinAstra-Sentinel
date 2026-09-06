@@ -233,29 +233,27 @@ export default function DashboardPage() {
       {/* ——— Mobile denser stack ——— */}
       <section className="space-y-4 lg:hidden" aria-label="Mobile dashboard">
         <div className="card-glow p-4">
-          {/* P-PIXEL-001: title + shield side-by-side, action grid below */}
-          <div className="flex items-center gap-3">
-            <div className="min-w-0 flex-1">
-              <p className="text-base font-semibold text-white">Quick Scan</p>
-              <p className="mt-0.5 text-[11px] text-slate-500">Powered by Sentinel AI</p>
-            </div>
-            <HeroShield className="h-20 w-auto shrink-0 sm:h-24" />
-          </div>
-          <div className="mt-4 grid grid-cols-4 gap-2">
-            {QUICK_SCAN.map((t) => (
-              <Link
-                key={t.href}
-                href={t.href}
-                className="flex min-h-[76px] flex-col items-center justify-center gap-1.5 rounded-xl border border-white/5 bg-ink-950/50 px-1 text-center transition hover:border-accent/30"
-              >
-                <span
-                  className={`inline-flex h-9 w-9 items-center justify-center rounded-lg border ${t.color}`}
+          {/* P-PIXEL-001: Quick Scan title; grid = 4 tiles | HeroShield side-by-side */}
+          <p className="text-base font-semibold text-white">Quick Scan</p>
+          <p className="mt-0.5 text-[11px] text-slate-500">Powered by Sentinel AI</p>
+          <div className="mt-3 grid grid-cols-[1fr_auto] items-center gap-3">
+            <div className="grid grid-cols-2 gap-2">
+              {QUICK_SCAN.map((t) => (
+                <Link
+                  key={t.href}
+                  href={t.href}
+                  className="flex min-h-[72px] flex-col items-center justify-center gap-1.5 rounded-xl border border-white/5 bg-ink-950/50 px-1 text-center transition hover:border-accent/30"
                 >
-                  <t.Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
-                </span>
-                <span className="text-[11px] font-semibold text-slate-200">{t.label}</span>
-              </Link>
-            ))}
+                  <span
+                    className={`inline-flex h-9 w-9 items-center justify-center rounded-lg border ${t.color}`}
+                  >
+                    <t.Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                  </span>
+                  <span className="text-[11px] font-semibold text-slate-200">{t.label}</span>
+                </Link>
+              ))}
+            </div>
+            <HeroShield className="h-28 w-auto shrink-0 sm:h-32" />
           </div>
         </div>
 

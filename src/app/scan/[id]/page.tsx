@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/db";
-import type { ScanResult } from "@/lib/types";
+import { loadScan } from "@/lib/services/scan";
 import { ScanResultView, scanTypeHref } from "@/components/ScanResultView";
 import Link from "next/link";
 
@@ -10,15 +9,8 @@ type Props = { params: Promise<{ id: string }> };
 
 export default async function ScanPage({ params }: Props) {
   const { id } = await params;
-  const scan = await prisma.scan.findUnique({ where: { id } });
-  if (!scan) notFound();
-
-  let result: ScanResult;
-  try {
-    result = JSON.parse(scan.resultJson) as ScanResult;
-  } catch {
-    notFound();
-  }
+  const result = await loadScan(id);
+  if (!result) notFound();
 
   const newScanHref = scanTypeHref(result.inputType);
 

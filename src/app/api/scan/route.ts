@@ -27,16 +27,22 @@ export async function POST(req: NextRequest) {
       "unknown";
     const rid = cookiesId(req) || crypto.randomUUID();
     const rateKey = clientKeyFromRequest(ip, rid);
-    const rate = await checkAndIncrementRateLimit(rateKey);
-    if (!rate.allowed) {
-      return NextResponse.json(
-        {
-          error: "Free tier limit reached (5 scans/day). Upgrade on /pricing (stub) or try tomorrow.",
-          limit: rate.limit,
-          remaining: rate.remaining,
-        },
-        { status: 429 },
-      );
+    let remaining = 5;
+    try {
+      const rate = await checkAndIncrementRateLimit(rateKey);
+      if (!rate.allowed) {
+        return NextResponse.json(
+          {
+            error: "Free tier limit reached (5 scans/day). Upgrade on /pricing or try tomorrow.",
+            limit: rate.limit,
+            remaining: rate.remaining,
+          },
+          { status: 429 },
+        );
+      }
+      remaining = rate.remaining;
+    } catch (e) {
+      console.warn("[SCAN_REQUEST] rate-limit store unavailable; continuing", String(e));
     }
 
     const result = await runScan({
@@ -48,7 +54,7 @@ export async function POST(req: NextRequest) {
       userAgent: req.headers.get("user-agent"),
     });
 
-    const res = NextResponse.json({ id: result.id, result, remaining: rate.remaining });
+    const res = NextResponse.json({ id: result.id, result, remaining });
     res.cookies.set("sentinel_rid", rid, {
       httpOnly: true,
       sameSite: "lax",
@@ -58,9 +64,19 @@ export async function POST(req: NextRequest) {
     return res;
   } catch (err) {
     if (err instanceof ScanRequestError) {
+      console.error("[SCAN_ERROR]", err.message);
       return NextResponse.json({ error: err.message }, { status: err.status });
     }
-    console.error("scan error", err);
-    return NextResponse.json({ error: "Scan failed" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Scan failed";
+    console.error("[SCAN_ERROR]", message);
+    return NextResponse.json(
+      {
+        error:
+          message.includes("Can't reach database") || message.includes("P1001")
+            ? "Database unavailable. Scan could not be stored. Check DATABASE_URL."
+            : message.slice(0, 180) || "Scan failed",
+      },
+      { status: 500 },
+    );
   }
 }

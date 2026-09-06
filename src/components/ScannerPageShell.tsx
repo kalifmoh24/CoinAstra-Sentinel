@@ -24,7 +24,7 @@ export function ScannerPageShell({
   bullets: string[];
 }) {
   return (
-    <div className="mx-auto max-w-3xl overflow-x-hidden px-4 pb-36 pt-10 sm:px-6 sm:pb-16 sm:pt-14">
+    <div className="mx-auto max-w-3xl overflow-x-hidden px-4 pb-36 pt-8 sm:px-6 sm:pb-16 sm:pt-10">
       <div className="mb-6 flex flex-wrap gap-2">
         {LINKS.map((l) => (
           <Link

@@ -15,6 +15,8 @@ import { analyzeToken } from "./token";
 import { aggregateScore } from "./score";
 import { analyzeTransaction } from "./transaction";
 import { analyzeWallet } from "./wallet";
+import { analyzeApprovals } from "./approvals";
+import { analyzeExposure } from "./exposure";
 import { withRecommendations } from "./recommendations";
 
 export interface EngineInput {
@@ -65,7 +67,11 @@ function buildSubject(
 export function runRiskEngine(input: EngineInput): ScanResult {
   let findings: Finding[] = [];
 
-  if (input.wallet) findings.push(...analyzeWallet(input.wallet, input.security ?? undefined));
+  if (input.wallet) {
+    findings.push(...analyzeWallet(input.wallet, input.security ?? undefined));
+    findings.push(...analyzeApprovals(input.wallet));
+    findings.push(...analyzeExposure(input.wallet));
+  }
 
   // Prefer token analyzer when subject is a token (includes contract heuristics + token signals)
   if (input.inputType === "token" && input.token) {
@@ -164,8 +170,12 @@ export function runRiskEngine(input: EngineInput): ScanResult {
     subject,
     txMeta,
     walletMeta,
+    approvals: input.wallet?.approvals ?? null,
+    holdings: input.wallet?.holdings ?? null,
   };
 }
 
 export { analyzeWallet, analyzeContract, analyzeToken, analyzeTransaction, aggregateScore };
+export { analyzeApprovals } from "./approvals";
+export { analyzeExposure } from "./exposure";
 export { withRecommendations, recommendationForFinding, isDangerousPermissionFinding } from "./recommendations";

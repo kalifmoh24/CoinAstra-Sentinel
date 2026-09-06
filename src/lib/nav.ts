@@ -98,9 +98,9 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/approval-checker",
     label: "Approval Checker",
     shortLabel: "Approvals",
-    status: "beta",
+    status: "live",
     description:
-      "Review allowance and approval risk patterns. Use Contract / Token scanners for live checks today.",
+      "List ERC-20 allowances with evidence — unlimited and risky spenders flagged. DEMO labeled when fixtures used.",
     relatedHref: "/scan/token",
     relatedLabel: "Token Scanner",
     group: "scanners",
@@ -110,9 +110,9 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/exposure-checker",
     label: "Exposure Checker",
     shortLabel: "Exposure",
-    status: "beta",
+    status: "live",
     description:
-      "Map counterparty and contract exposure from scan evidence. DEMO fixtures stay labeled DEMO.",
+      "Map holdings and approval-driven exposure from structured evidence. Balances never invented. DEMO labeled.",
     relatedHref: "/scan/wallet",
     relatedLabel: "Wallet Scanner",
     group: "scanners",

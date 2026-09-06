@@ -131,6 +131,9 @@ export async function getEthereumWallet(address: string): Promise<WalletData> {
     newContractInteractions: null,
     mixerExposure: null,
     activity,
+    // ERC-20 allowances/holdings need token APIs / eth_call — fail closed (null = not evaluated)
+    approvals: null,
+    holdings: null,
     demo: false,
     sources: ["etherscan"],
   };

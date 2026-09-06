@@ -36,6 +36,18 @@ const BY_ID: Record<string, string> = {
     "Trace funding provenance before accepting large inbound transfers from this wallet.",
   "wallet-age-new":
     "Prefer waiting for more history or using a secondary wallet for first interactions with untrusted contracts.",
+  "approval-unlimited":
+    "Revoke or reduce this allowance via a trusted revoke tool — Sentinel does not broadcast transactions.",
+  "approval-risky-spender":
+    "Do not leave value behind this approval. Revoke if you control the wallet; do not interact with the spender.",
+  "approval-stale":
+    "Review and revoke unused stale allowances to shrink attack surface.",
+  "exposure-high-risk-counterparty":
+    "Map which assets/approvals touch these counterparties and isolate high-value funds if you control the wallet.",
+  "exposure-concentrated-holding":
+    "Concentration is not inherently malicious — size risk accordingly and watch approvals on the dominant token.",
+  "exposure-via-unlimited-approval":
+    "Revoke unlimited allowances on high-value tokens before treating exposure as contained.",
   "contract-unverified":
     "Do not approve unlimited allowances until source is verified or audited by a party you trust.",
   "contract-new":

@@ -1,6 +1,8 @@
 import type { InputType, ScanResult } from "@/lib/types";
 import { RiskScore } from "./RiskScore";
 import { Disclaimer } from "./Disclaimer";
+import { ApprovalsPanel } from "./ApprovalsPanel";
+import { ExposurePanel } from "./ExposurePanel";
 import { SubjectHeader } from "./SubjectHeader";
 import { ScanResultTabs } from "./ScanResultTabs";
 import { TransactionPreviewPanel } from "./TransactionPreviewPanel";
@@ -207,6 +209,13 @@ export function ScanResultView({ result }: { result: ScanResult }) {
         </div>
       )}
 
+      {(result.inputType === "wallet" || result.approvals != null || result.holdings != null) && (
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          <ApprovalsPanel approvals={result.approvals} findings={result.findings} demo={result.demo} />
+          <ExposurePanel holdings={result.holdings} findings={result.findings} demo={result.demo} />
+        </div>
+      )}
+      
       <Disclaimer />
     </div>
   );

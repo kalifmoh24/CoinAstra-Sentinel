@@ -3,23 +3,29 @@ import type { ScanResult } from "@/lib/types";
 import { shortAddr } from "@/lib/utils";
 import { RiskGauge } from "./RiskGauge";
 import { DangerousPermissions } from "./DangerousPermissions";
+import { ArrowLeftRight, AlertTriangle } from "lucide-react";
 
 export function TransactionPreviewPanel({ result }: { result: ScanResult }) {
   const tx = result.txMeta;
   const method = tx?.method ?? null;
   const looksApprove =
     method != null && /approve|permit|allowance/i.test(method);
+  const looksSwap = method != null && /swap|exact|exchange/i.test(method);
 
   return (
     <div className="space-y-4">
       <div className="card-surface p-5">
-        <div className="flex items-center gap-2">
-          <span className="text-lg" aria-hidden>
-            ⇄
+        <div className="flex items-center gap-3">
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent/15 text-accent-purple">
+            <ArrowLeftRight className="h-5 w-5" strokeWidth={1.75} aria-hidden />
           </span>
           <div>
             <h2 className="text-base font-semibold text-white">
-              {method ? `You are about to call ${method}` : "Transaction preview"}
+              {looksSwap
+                ? "You are about to Swap Tokens"
+                : method
+                  ? `You are about to call ${method}`
+                  : "Transaction preview"}
             </h2>
             <p className="text-xs text-slate-500">
               Analysis only — Sentinel never signs, broadcasts, or submits transactions.
@@ -45,9 +51,12 @@ export function TransactionPreviewPanel({ result }: { result: ScanResult }) {
             <dd className="mt-1 capitalize text-slate-200">{result.chain}</dd>
           </div>
           <div className="rounded-xl border border-white/5 bg-ink-950/50 p-3">
-            <dt className="text-[10px] uppercase tracking-wider text-slate-500">Value (native)</dt>
+            <dt className="text-[10px] uppercase tracking-wider text-slate-500">You Send</dt>
             <dd className="mt-1 text-slate-200">
               {tx?.valueEth != null ? `${tx.valueEth} ETH` : "Insufficient data"}
+              {result.demo && tx?.valueEth != null ? (
+                <span className="ml-1 text-[10px] text-amber-300/80">DEMO</span>
+              ) : null}
             </dd>
           </div>
           <div className="rounded-xl border border-white/5 bg-ink-950/50 p-3 sm:col-span-2">
@@ -72,20 +81,22 @@ export function TransactionPreviewPanel({ result }: { result: ScanResult }) {
         <RiskGauge score={result.score} band={result.band} />
       </div>
 
-      {(looksApprove || result.findings.some((f) => /approv|permit|allowance/i.test(f.title))) && (
+      {(looksApprove ||
+        result.findings.some((f) => /approv|permit|allowance/i.test(f.title)) ||
+        tx?.interactsWithContract) && (
         <div className="rounded-2xl border border-risk-critical/30 bg-risk-critical/5 p-4">
-          <h3 className="text-sm font-medium text-risk-critical">Permissions requested</h3>
+          <h3 className="text-sm font-medium text-risk-critical">Permissions Requested</h3>
           <ul className="mt-3 space-y-2 text-sm">
             {looksApprove && (
               <li className="flex items-center justify-between rounded-lg border border-risk-critical/20 bg-ink-950/40 px-3 py-2">
-                <span className="text-slate-200">Sensitive approval / allowance method</span>
-                <span className="text-[10px] uppercase text-risk-critical">High risk</span>
+                <span className="text-slate-200">Unlimited USDC Approval</span>
+                <span className="text-[10px] uppercase text-risk-critical">High Risk</span>
               </li>
             )}
             {tx?.interactsWithContract && (
-              <li className="flex items-center justify-between rounded-lg border border-risk-high/20 bg-ink-950/40 px-3 py-2">
-                <span className="text-slate-200">Contract interaction</span>
-                <span className="text-[10px] uppercase text-risk-high">Medium risk</span>
+              <li className="flex items-center justify-between rounded-lg border border-risk-moderate/20 bg-ink-950/40 px-3 py-2">
+                <span className="text-slate-200">Contract Interaction</span>
+                <span className="text-[10px] uppercase text-risk-moderate">Medium Risk</span>
               </li>
             )}
           </ul>
@@ -99,21 +110,19 @@ export function TransactionPreviewPanel({ result }: { result: ScanResult }) {
           type="button"
           disabled
           title="Sentinel never executes transactions. Review education materials instead."
-          className="flex min-h-[48px] w-full cursor-not-allowed items-center justify-center rounded-xl border border-risk-critical/40 bg-risk-critical/20 px-4 text-sm font-semibold text-risk-critical opacity-70"
+          className="flex min-h-[48px] w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl border border-risk-critical/40 bg-risk-critical/20 px-4 text-sm font-semibold text-risk-critical opacity-80"
         >
-          ⚠️ Proceed Anyway (Not Recommended) — disabled
+          <AlertTriangle className="h-4 w-4" strokeWidth={2} aria-hidden />
+          Proceed Anyway (Not Recommended)
         </button>
         <p className="text-center text-[11px] text-slate-500">
-          Sentinel does not execute or simulate broadcasting.{" "}
-          <Link href="/ai-intelligence" className="text-accent-purple hover:underline">
-            Learn how analysis works
-          </Link>
+          Disabled permanently — Sentinel does not execute or broadcast.
         </p>
         <Link
           href="/scan/transaction"
           className="flex min-h-[44px] w-full items-center justify-center text-sm text-slate-400 hover:text-white"
         >
-          Cancel — back to Transaction Preview
+          Cancel Transaction
         </Link>
       </div>
     </div>

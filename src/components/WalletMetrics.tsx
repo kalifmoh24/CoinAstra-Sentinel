@@ -13,16 +13,38 @@ export function WalletMetrics({ result }: { result: ScanResult }) {
         })()
       : "—";
 
+  /** Illustrative DEMO cells only when live evidence is missing — always labeled. */
   const cells = [
-    { label: "Wallet Age", value: age },
-    { label: "Tx Count", value: m.txCount != null ? m.txCount.toLocaleString() : "—" },
+    { label: "Wallet Age", value: age, demo: false },
     {
-      label: "Balance (native)",
-      value: m.balanceEth != null ? `${m.balanceEth} ETH` : "—",
+      label: "Tx Count",
+      value: m.txCount != null ? m.txCount.toLocaleString() : "—",
+      demo: false,
     },
     {
-      label: "Labels",
-      value: m.labels?.length ? m.labels.join(", ") : "—",
+      label: "Total Received",
+      value: result.demo ? "$1.24M" : "—",
+      demo: result.demo === true,
+    },
+    {
+      label: "Total Sent",
+      value: result.demo ? "$1.18M" : "—",
+      demo: result.demo === true,
+    },
+    {
+      label: "Current Balance",
+      value:
+        m.balanceEth != null
+          ? `${m.balanceEth} ETH`
+          : result.demo
+            ? "$54,230.12"
+            : "—",
+      demo: m.balanceEth == null && result.demo === true,
+    },
+    {
+      label: "Tokens Held",
+      value: result.demo ? "27" : "—",
+      demo: result.demo === true,
     },
   ];
 
@@ -36,10 +58,13 @@ export function WalletMetrics({ result }: { result: ScanResult }) {
           </span>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {cells.map((c) => (
           <div key={c.label} className="rounded-xl border border-white/5 bg-ink-950/40 p-3">
-            <p className="text-[10px] uppercase tracking-wider text-slate-500">{c.label}</p>
+            <p className="text-[10px] uppercase tracking-wider text-slate-500">
+              {c.label}
+              {c.demo ? <span className="ml-1 text-amber-300/80">DEMO</span> : null}
+            </p>
             <p className="mt-1 truncate text-sm font-medium text-white">{c.value}</p>
           </div>
         ))}

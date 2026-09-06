@@ -61,7 +61,7 @@ export function SearchBox({ stickyCta = false }: { stickyCta?: boolean }) {
             <input
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder="Wallet, token, contract, or tx hash"
+              placeholder="Paste wallet address..."
               className="min-h-[48px] w-full rounded-xl border border-transparent bg-ink-800/80 px-4 py-3.5 font-mono text-base text-white placeholder:text-slate-500 focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/40"
               spellCheck={false}
               autoComplete="off"

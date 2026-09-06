@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { BOTTOM_PRIMARY } from "@/lib/nav";
 import { MoreMenu } from "./MoreMenu";
+import { NavIcon, Menu } from "./NavIcons";
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -32,11 +33,11 @@ export function BottomNav() {
                   }`}
                 >
                   <span
-                    className={`flex h-7 w-7 items-center justify-center rounded-md text-xs font-bold ${
-                      active ? "bg-accent/20 text-accent" : "bg-ink-800/80"
+                    className={`flex h-7 w-7 items-center justify-center rounded-md ${
+                      active ? "bg-accent/20 text-accent" : "bg-ink-800/80 text-slate-400"
                     }`}
                   >
-                    {item.icon}
+                    <NavIcon name={item.icon} className="h-4 w-4" />
                   </span>
                   {item.label}
                 </Link>
@@ -52,11 +53,11 @@ export function BottomNav() {
               }`}
             >
               <span
-                className={`flex h-7 w-7 items-center justify-center rounded-md text-xs font-bold ${
-                  moreOpen ? "bg-accent/20" : "bg-ink-800/80"
+                className={`flex h-7 w-7 items-center justify-center rounded-md ${
+                  moreOpen ? "bg-accent/20 text-accent" : "bg-ink-800/80 text-slate-400"
                 }`}
               >
-                ≡
+                <Menu className="h-4 w-4" strokeWidth={1.75} aria-hidden />
               </span>
               More
             </button>

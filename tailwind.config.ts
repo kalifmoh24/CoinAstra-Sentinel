@@ -54,7 +54,7 @@ const config: Config = {
         grid: "48px 48px",
       },
       width: {
-        sidebar: "188px",
+        sidebar: "220px",
       },
     },
   },

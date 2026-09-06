@@ -6,7 +6,7 @@ export function HeroShield({ className = "" }: { className?: string }) {
       <div className="absolute h-16 w-16 rounded-full bg-accent-violet/30 blur-xl" />
       <svg
         viewBox="0 0 120 140"
-        className="relative h-24 w-20 drop-shadow-[0_0_24px_rgba(168,85,247,0.45)] sm:h-32 sm:w-28"
+        className="relative h-28 w-24 drop-shadow-[0_0_28px_rgba(168,85,247,0.55)] sm:h-40 sm:w-32"
       >
         <defs>
           <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">

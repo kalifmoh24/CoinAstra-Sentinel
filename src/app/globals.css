@@ -15,9 +15,11 @@ body {
 
 body {
   @apply bg-ink-950 text-slate-100 antialiased;
+  background-color: #050816;
   background-image:
-    radial-gradient(ellipse 70% 45% at 20% -10%, rgba(168, 85, 247, 0.16), transparent),
-    radial-gradient(ellipse 40% 30% at 100% 0%, rgba(139, 92, 246, 0.08), transparent);
+    radial-gradient(ellipse 80% 50% at 12% -8%, rgba(139, 92, 246, 0.22), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 92% 0%, rgba(59, 130, 246, 0.08), transparent 50%),
+    radial-gradient(ellipse 40% 30% at 70% 100%, rgba(168, 85, 247, 0.08), transparent 50%);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
 }
@@ -28,11 +30,11 @@ body {
   }
 
   .card-surface {
-    @apply rounded-xl border border-white/5 bg-ink-850/80 shadow-card;
+    @apply rounded-2xl border border-white/[0.06] bg-[#0b1224]/90 shadow-card;
   }
 
   .card-glow {
-    @apply rounded-xl border border-accent/25 bg-ink-900/80 shadow-glow-purple;
+    @apply rounded-2xl border border-violet-500/25 bg-[#0d1024]/90 shadow-glow-purple;
   }
 }
 
@@ -70,9 +72,9 @@ body {
   }
 }
 
-/* Desktop shell: ~188px sidebar matching mockup */
+/* Desktop shell: ~220px sidebar matching mockup */
 @media (min-width: 1024px) {
   .app-main-offset {
-    margin-left: 188px;
+    margin-left: 220px;
   }
 }

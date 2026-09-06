@@ -53,7 +53,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                           href={item.href}
                           className={`relative flex min-h-[32px] items-center gap-2 rounded-lg px-2 py-1.5 text-[12px] transition ${
                             active
-                              ? "bg-accent/15 font-medium text-accent-purple"
+                              ? "bg-accent/25 font-medium text-white"
                               : "text-slate-400 hover:bg-white/5 hover:text-white"
                           }`}
                         >
@@ -65,7 +65,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                           ) : null}
                           <NavIcon
                             name={item.icon}
-                            className={`h-3.5 w-3.5 shrink-0 ${active ? "text-accent" : "text-slate-500"}`}
+                            className={`h-3.5 w-3.5 shrink-0 ${active ? "text-white" : "text-slate-500"}`}
                           />
                           <span className="min-w-0 flex-1 truncate">{item.label}</span>
                           {item.badgeDemo != null && (

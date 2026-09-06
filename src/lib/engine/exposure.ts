@@ -1,5 +1,7 @@
 import type { Finding, WalletData, WalletHolding } from "../types";
 
+/** P-AE-006: keep exposure impacts from double-counting wallet/approval findings. */
+
 export function analyzeExposure(wallet: WalletData): Finding[] {
   const findings: Finding[] = [];
   const src = wallet.sources.join(", ") || "exposure-provider";
@@ -15,7 +17,7 @@ export function analyzeExposure(wallet: WalletData): Finding[] {
       severity: "high",
       title: "Exposure to high-risk counterparties",
       description: `${highRisk.length} labeled high-risk counterparty interaction(s) in provider data.`,
-      scoreImpact: Math.min(28, 12 + highRisk.length * 4),
+      scoreImpact: Math.min(14, 6 + highRisk.length * 2),
       evidence: [
         {
           reason: `high-risk counterparties count=${highRisk.length}`,
@@ -36,7 +38,7 @@ export function analyzeExposure(wallet: WalletData): Finding[] {
       title: "Insufficient data: holdings",
       description:
         "No token holdings inventory available. Concentration and balance-based exposure cannot be assessed — unknown, not safe.",
-      scoreImpact: 6,
+      scoreImpact: 5,
       evidence: [{ reason: "holdings=null|missing", source: src }],
       recommendation:
         "Provide a holdings data source or verify balances on a primary explorer; Sentinel will not invent balances.",
@@ -65,7 +67,7 @@ export function analyzeExposure(wallet: WalletData): Finding[] {
       severity: "high",
       title: "Holdings exposed via unlimited approvals",
       description: "One or more unlimited allowances can move tokens without a new signature per transfer.",
-      scoreImpact: 18,
+      scoreImpact: 8,
       evidence: [
         {
           reason: "unlimited approvals present",

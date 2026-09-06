@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+/** Quick scanners — Home + four live scanners. Full IA lives in AppShell drawer/sidebar. */
 const ITEMS = [
   { href: "/", label: "Home", icon: "⌂" },
   { href: "/scan/wallet", label: "Wallet", icon: "W" },
@@ -16,18 +17,18 @@ export function BottomNav() {
 
   return (
     <nav
-      aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-ink-950/95 backdrop-blur-xl sm:hidden"
+      aria-label="Quick scanners"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-ink-950/95 backdrop-blur-xl lg:hidden"
       style={{ paddingBottom: "max(0.35rem, env(safe-area-inset-bottom, 0px))" }}
     >
-      <ul className="mx-auto flex max-w-lg items-stretch justify-between px-1 pt-1">
+      <ul className="mx-auto flex max-w-lg items-stretch justify-between overflow-x-hidden px-1 pt-1">
         {ITEMS.map((item) => {
           const active =
             item.href === "/"
               ? pathname === "/"
               : pathname === item.href || pathname.startsWith(item.href + "/");
           return (
-            <li key={item.href} className="flex-1">
+            <li key={item.href} className="min-w-0 flex-1">
               <Link
                 href={item.href}
                 className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-1.5 text-[10px] font-medium transition ${

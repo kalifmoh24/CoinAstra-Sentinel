@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
-import { Nav } from "@/components/Nav";
-import { BottomNav } from "@/components/BottomNav";
+import { AppShell } from "@/components/AppShell";
 import "./globals.css";
 
 const geistSans = Inter({
@@ -54,12 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="min-h-screen overflow-x-hidden font-sans">
-        <Nav />
-        <main className="pb-20 sm:pb-0">{children}</main>
-        <footer className="mb-16 border-t border-white/5 py-8 text-center text-xs text-slate-600 sm:mb-0">
-          © {new Date().getFullYear()} CoinAstra · Sentinel Phase 2 · coinastra.io
-        </footer>
-        <BottomNav />
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

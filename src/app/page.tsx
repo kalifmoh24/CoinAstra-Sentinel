@@ -1,13 +1,14 @@
 import { SearchBox } from "@/components/SearchBox";
 import { WhatSentinelChecks } from "@/components/WhatSentinelChecks";
 import { Disclaimer } from "@/components/Disclaimer";
+import { QuickScanLinks } from "@/components/QuickScanLinks";
 
 export default function HomePage() {
   return (
     <>
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 bg-grid-fade bg-grid opacity-40" />
-        <div className="relative mx-auto max-w-6xl px-4 pb-8 pt-16 sm:px-6 sm:pt-24">
+        <div className="relative mx-auto max-w-6xl px-4 pb-8 pt-12 sm:px-6 sm:pt-24">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-sm font-medium text-accent-cyan">
               The security intelligence layer for crypto.
@@ -21,13 +22,14 @@ export default function HomePage() {
             </p>
           </div>
           <div className="mx-auto mt-10 max-w-3xl">
-            <SearchBox />
+            <SearchBox stickyCta />
           </div>
           <div className="mx-auto mt-8 max-w-3xl">
             <Disclaimer compact />
           </div>
         </div>
       </section>
+      <QuickScanLinks />
       <WhatSentinelChecks />
       <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
         <div className="rounded-2xl border border-white/5 bg-ink-900/40 p-6 sm:p-8">

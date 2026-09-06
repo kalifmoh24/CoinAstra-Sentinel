@@ -16,6 +16,8 @@ import type { InputType, ScanResult } from "@/lib/types";
 const BodySchema = z.object({
   input: z.string().min(1).max(128),
   chain: z.string().default("ethereum"),
+  /** Explicit scanner type from dedicated pages; "auto" uses detection. */
+  type: z.enum(["wallet", "token", "contract", "transaction", "auto"]).optional().default("auto"),
 });
 
 function cookiesId(req: NextRequest): string | null {
@@ -32,6 +34,7 @@ export async function POST(req: NextRequest) {
 
     const input = normalizeInput(parsed.data.input);
     const chain = parsed.data.chain || "ethereum";
+    const requestedType = parsed.data.type ?? "auto";
 
     let inputType: InputType = detectInputType(input);
     if (inputType === "unknown") {
@@ -39,6 +42,25 @@ export async function POST(req: NextRequest) {
         { error: "Unrecognized input. Provide an EVM address (0x…40 hex) or transaction hash (0x…64 hex)." },
         { status: 400 },
       );
+    }
+
+    // Validate explicit type against input shape
+    if (requestedType === "transaction") {
+      if (!isTxHash(input)) {
+        return NextResponse.json(
+          { error: "Transaction scanner expects a 66-character tx hash (0x + 64 hex)." },
+          { status: 400 },
+        );
+      }
+      inputType = "transaction";
+    } else if (requestedType === "wallet" || requestedType === "token" || requestedType === "contract") {
+      if (!isEvmAddress(input)) {
+        return NextResponse.json(
+          { error: `${requestedType} scanner expects an EVM address (0x + 40 hex).` },
+          { status: 400 },
+        );
+      }
+      inputType = requestedType;
     }
 
     const ip =
@@ -67,7 +89,7 @@ export async function POST(req: NextRequest) {
     let market = null;
     let security = null;
 
-    if (isTxHash(input)) {
+    if (requestedType === "transaction" || (requestedType === "auto" && isTxHash(input))) {
       inputType = "transaction";
       tx = await blockchainProvider.getTransaction(input, chain);
       if (tx.to && isEvmAddress(tx.to)) {
@@ -77,6 +99,21 @@ export async function POST(req: NextRequest) {
         }
         wallet = await blockchainProvider.getWallet(tx.from || tx.to, chain);
       }
+    } else if (requestedType === "wallet") {
+      inputType = "wallet";
+      wallet = await blockchainProvider.getWallet(input, chain);
+      security = await securityProvider.screenAddress(input);
+    } else if (requestedType === "token") {
+      inputType = "token";
+      contract = await contractAnalysisProvider.analyze(input, chain);
+      token = await contractAnalysisProvider.asToken(input, chain);
+      market = await marketProvider.getTokenMarket(input);
+    } else if (requestedType === "contract") {
+      inputType = "contract";
+      contract = await contractAnalysisProvider.analyze(input, chain);
+      // Enrich with token fields when available, but keep type as contract
+      token = await contractAnalysisProvider.asToken(input, chain);
+      market = await marketProvider.getTokenMarket(input);
     } else if (isEvmAddress(input)) {
       const hasCode = await blockchainProvider.hasCode(input, chain);
       if (hasCode) {
@@ -84,7 +121,6 @@ export async function POST(req: NextRequest) {
         contract = await contractAnalysisProvider.analyze(input, chain);
         token = await contractAnalysisProvider.asToken(input, chain);
         market = await marketProvider.getTokenMarket(input);
-        // Also treat as token subject for UI
         if (token.symbol) inputType = "token";
       } else {
         inputType = "wallet";
@@ -93,7 +129,6 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Persist placeholder id first
     const created = await prisma.scan.create({
       data: {
         input,

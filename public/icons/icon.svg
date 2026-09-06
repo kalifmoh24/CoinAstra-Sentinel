@@ -1,0 +1,6 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 192 192'>
+  <rect width='192' height='192' rx='40' fill='#05070d'/>
+  <rect x='16' y='16' width='160' height='160' rx='32' fill='url(#g)'/>
+  <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop stop-color='#3b82f6'/><stop offset='1' stop-color='#22d3ee'/></linearGradient></defs>
+  <text x='96' y='112' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='64' fill='#05070d'>CA</text>
+</svg>

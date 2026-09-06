@@ -2,83 +2,82 @@
 
 **Know Before You Sign.** — The security intelligence layer for crypto ([coinastra.io](https://coinastra.io)).
 
-Phase 1 MVP: universal search → provider data → **deterministic risk engine** → evidence → Sentinel AI explanation.
+Phase 2: dedicated scanner pages, expanded token/contract/transaction analyzers, mobile-first UX + PWA basics, PostgreSQL.
 
-> AI never invents blockchain facts or the risk score. Missing data surfaces as **Insufficient data**. Demo fixtures are labeled **DEMO**. Scores are analytical assessments, not financial/security guarantees.
+> AI never invents blockchain facts or the risk score. Missing data surfaces as **Insufficient data**. Demo fixtures are labeled **DEMO**. Scores are analytical assessments, not financial/security guarantees. Transaction scanner is **analysis only** — never signs or executes.
 
 ## Architecture
 
-```
-Blockchain / provider data
-        ↓
-Deterministic risk engine (0–100 + band + categories + evidence)
-        ↓
-Sentinel AI explanation (templated, or OpenAI if keyed)
-        ↓
-User (result page)
-```
+See providers -> risk engine -> AI explanation -> result page.
 
 ### Stack
 - Next.js App Router + TypeScript + Tailwind CSS
-- Prisma (SQLite local/demo; Postgres via `DATABASE_URL`)
-- Modular providers + chain adapters (`ethereum` implemented; others stubbed)
+- Prisma + PostgreSQL (Neon or managed)
+- Modular providers + chain adapters
+- Web app manifest + icons (Add to Home Screen)
 - Vercel-ready
 
 ## Quick start
 
-```bash
-cp .env.example .env
-# DEMO_MODE=true and DATABASE_URL="file:./dev.db" are enough for local demo
+1. Copy .env.example to .env
+2. Set DATABASE_URL to a PostgreSQL URL (Neon recommended)
+3. Install deps, push Prisma schema, run the Next.js dev server
+4. Open http://localhost:3000
 
-npm install
-npx prisma db push
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000), paste any EVM address or 66-char tx hash, **Scan with Sentinel**.
-
-With `DEMO_MODE=true` (or no explorer keys), synthetic fixtures power an end-to-end scan and are labeled **DEMO**.
+With DEMO_MODE=true (or no explorer keys), synthetic fixtures power scans and are labeled DEMO. Persistence still requires reachable Postgres.
 
 ### Environment
 
-| Variable | Purpose |
-|----------|---------|
-| `DEMO_MODE` | Force demo fixtures |
-| `ETHERSCAN_API_KEY` | Live Ethereum explorer data |
-| `ALCHEMY_API_KEY` | Reserved for RPC enrichment |
-| `OPENAI_API_KEY` | Optional LLM explanations |
-| `DATABASE_URL` | Postgres URL or `file:./dev.db` |
-| `NEXT_PUBLIC_APP_URL` | Canonical app URL |
+- DEMO_MODE — force demo fixtures
+- ETHERSCAN_API_KEY — live Ethereum explorer data
+- ALCHEMY_API_KEY — reserved for RPC enrichment
+- OPENAI_API_KEY — optional LLM explanations
+- DATABASE_URL — PostgreSQL connection string (required)
+- NEXT_PUBLIC_APP_URL — canonical app URL
 
 ## Product surface
 
-| Route | Description |
-|-------|-------------|
-| `/` | Homepage + universal search |
-| `/scan/[id]` | Full result (score, bands, categories, findings, AI, disclaimer) |
-| `/pricing` | Free / Pro / Business stub (no payments) |
-| `POST /api/scan` | Validate, rate-limit (5/day), providers, engine, AI, persist |
-| `GET /api/v1/{wallet,token,contract,transaction}/[id]` | Phase 1 stubs |
+- / — Homepage + universal search + quick links
+- /scan/wallet (alias /wallet) — Wallet scanner UX
+- /scan/token — Token security scanner
+- /scan/contract — Smart contract scanner
+- /scan/transaction — Tx preview / analysis (never executes)
+- /scan/[id] — Full result page
+- /pricing — Free / Pro / Business stub (no payments)
+- POST /api/scan — Validate, rate-limit, optional type param, engine, AI, persist
+- GET /api/v1/{wallet,token,contract,transaction}/[id] — API stubs
+- /manifest.webmanifest — PWA manifest
 
-## Risk engine (Phase 1 subset)
+POST /api/scan accepts type: auto | wallet | token | contract | transaction.
 
-- **Wallet:** age, tx count, high-risk interactions, mixer stub, rapid movement, new contracts, funding source
-- **Token/Contract:** verified, age, proxy/upgradeable, owner privileges, honeypot heuristic hook, mint/pause/blacklist ABI heuristics
-- **Bands:** Very Low / Low / Moderate / High / Critical
-- **Categories:** Security, Contract, Wallet, Liquidity, Ownership, Transaction
-- Every finding includes `evidence: { reason, source, raw? }`
+## Risk engine
+
+- Wallet: age, tx count, high-risk interactions, mixer stub, rapid movement, new contracts, funding source
+- Token: contract checks plus symbol/decimals/supply, holder breadth, volume/price signals
+- Contract: verified, age, proxy/upgradeable, owner (incl. renounced), mint/pause/blacklist/fee/selfdestruct ABI heuristics, honeypot hook
+- Transaction: analysis-only banner, sensitive methods, approvals, value bands, parties/status evidence
+- Bands: Very Low / Low / Moderate / High / Critical
+- Categories: Security, Contract, Wallet, Liquidity, Ownership, Transaction
+- Every finding includes evidence with reason and source
+
+## Mobile and PWA
+
+- Larger tap targets, sticky scan CTA above bottom nav, safe-area insets
+- Bottom-friendly primary nav on small screens
+- Responsive result cards
+- Web manifest + icons + theme-color for Add to Home Screen (not a native store app)
 
 ## Free tier
 
-5 scans/day keyed by cookie (`sentinel_rid`) with IP fallback (`RateLimitBucket` in Prisma).
+5 scans/day keyed by cookie sentinel_rid with IP fallback via RateLimitBucket.
 
-## Out of scope (scaffolded only)
+## Out of scope
 
-Full multi-chain, monitoring/alerts, payments, browser extension, transaction execution.
+Full multi-chain live data, monitoring/alerts, payments, browser extension, transaction execution / wallet signing.
 
 ## Deploy
 
-Connect the GitHub repo to Vercel, set env vars (use Postgres `DATABASE_URL` in production), deploy.
+Connect the GitHub repo to Vercel, set env vars (Postgres DATABASE_URL required, e.g. Neon), deploy, then push/migrate the Prisma schema against production.
 
 ## License
 

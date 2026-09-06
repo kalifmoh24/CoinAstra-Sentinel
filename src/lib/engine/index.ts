@@ -10,6 +10,7 @@ import type {
 } from "../types";
 import { DISCLAIMER } from "../types";
 import { analyzeContract } from "./contract";
+import { analyzeToken } from "./token";
 import { aggregateScore } from "./score";
 import { analyzeTransaction } from "./transaction";
 import { analyzeWallet } from "./wallet";
@@ -34,8 +35,22 @@ export function runRiskEngine(input: EngineInput): ScanResult {
   const findings: Finding[] = [];
 
   if (input.wallet) findings.push(...analyzeWallet(input.wallet, input.security ?? undefined));
-  if (input.contract) findings.push(...analyzeContract(input.contract, input.market ?? undefined));
-  else if (input.token) findings.push(...analyzeContract(input.token, input.market ?? undefined));
+
+  // Prefer token analyzer when subject is a token (includes contract heuristics + token signals)
+  if (input.inputType === "token" && input.token) {
+    findings.push(...analyzeToken(input.token, input.market ?? undefined));
+  } else if (input.token && !input.contract) {
+    findings.push(...analyzeToken(input.token, input.market ?? undefined));
+  } else if (input.contract) {
+    if (input.inputType === "token" || (input.token && "symbol" in input.token && input.token.symbol)) {
+      findings.push(...analyzeToken((input.token ?? input.contract) as TokenData, input.market ?? undefined));
+    } else {
+      findings.push(...analyzeContract(input.contract, input.market ?? undefined));
+    }
+  } else if (input.token) {
+    findings.push(...analyzeToken(input.token, input.market ?? undefined));
+  }
+
   if (input.tx) findings.push(...analyzeTransaction(input.tx));
 
   if (findings.length === 0) {
@@ -85,4 +100,4 @@ export function runRiskEngine(input: EngineInput): ScanResult {
   };
 }
 
-export { analyzeWallet, analyzeContract, analyzeTransaction, aggregateScore };
+export { analyzeWallet, analyzeContract, analyzeToken, analyzeTransaction, aggregateScore };

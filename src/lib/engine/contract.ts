@@ -9,6 +9,12 @@ function abiHas(abi: unknown[] | null | undefined, name: string): boolean {
   });
 }
 
+function abiHasAny(abi: unknown[] | null | undefined, names: string[]): boolean {
+  return names.some((n) => abiHas(abi, n));
+}
+
+const ZERO = /^0x0{40}$/i;
+
 export function analyzeContract(
   contract: ContractData | TokenData,
   market?: MarketData,
@@ -86,6 +92,16 @@ export function analyzeContract(
         evidence: [{ reason: `createdAt=${contract.createdAt}`, source: src, raw: { ageDays } }],
       });
     }
+  } else {
+    findings.push({
+      id: "contract-age-unknown",
+      category: "Contract",
+      severity: "info",
+      title: "Insufficient data: deployment age",
+      description: "Contract creation timestamp was not available.",
+      scoreImpact: 4,
+      evidence: [{ reason: "createdAt missing", source: src }],
+    });
   }
 
   const upgradeable = contract.isProxy || contract.flags?.upgradeable;
@@ -147,15 +163,87 @@ export function analyzeContract(
     });
   }
 
-  if (contract.owner) {
+  // Phase 2: additional privilege / destruction heuristics from ABI
+  if (abiHasAny(contract.abi, ["selfdestruct", "destroy", "suicide"])) {
     findings.push({
-      id: "has-owner",
+      id: "abi-selfdestruct",
+      category: "Security",
+      severity: "high",
+      title: "Self-destruct capability in ABI",
+      description: "ABI includes a self-destruct / destroy-style function.",
+      scoreImpact: 18,
+      evidence: [{ reason: "selfdestruct/destroy in ABI", source: src }],
+    });
+  }
+
+  if (abiHasAny(contract.abi, ["setTaxFee", "setFee", "setFees", "excludeFromFee"])) {
+    findings.push({
+      id: "abi-fee-controls",
+      category: "Ownership",
+      severity: "moderate",
+      title: "Fee/tax control functions",
+      description: "ABI suggests admin-controlled transfer fees or tax parameters.",
+      scoreImpact: 10,
+      evidence: [{ reason: "fee/tax setters in ABI", source: src }],
+    });
+  }
+
+  if (abiHasAny(contract.abi, ["transferOwnership", "renounceOwnership"])) {
+    findings.push({
+      id: "abi-ownership-transfer",
       category: "Ownership",
       severity: "info",
-      title: "Owner address observed",
-      description: `Owner/admin candidate: ${contract.owner}`,
-      scoreImpact: 4,
-      evidence: [{ reason: `owner=${contract.owner}`, source: src }],
+      title: "Ownership transfer functions present",
+      description: "ABI includes Ownable-style transfer/renounce methods.",
+      scoreImpact: 3,
+      evidence: [{ reason: "transferOwnership/renounceOwnership in ABI", source: src }],
+    });
+  }
+
+  if (contract.owner) {
+    if (ZERO.test(contract.owner)) {
+      findings.push({
+        id: "owner-renounced",
+        category: "Ownership",
+        severity: "positive",
+        title: "Owner appears renounced",
+        description: "Owner address is the zero address (common renounce pattern).",
+        scoreImpact: -8,
+        positive: true,
+        evidence: [{ reason: `owner=${contract.owner}`, source: src }],
+      });
+    } else {
+      findings.push({
+        id: "has-owner",
+        category: "Ownership",
+        severity: "info",
+        title: "Owner address observed",
+        description: `Owner/admin candidate: ${contract.owner}`,
+        scoreImpact: 4,
+        evidence: [{ reason: `owner=${contract.owner}`, source: src }],
+      });
+    }
+  } else {
+    findings.push({
+      id: "owner-unknown",
+      category: "Ownership",
+      severity: "info",
+      title: "Insufficient data: owner",
+      description: "No owner/admin address was returned by providers.",
+      scoreImpact: 3,
+      evidence: [{ reason: "owner missing", source: src }],
+    });
+  }
+
+  if (contract.compiler) {
+    findings.push({
+      id: "compiler-version",
+      category: "Contract",
+      severity: "info",
+      title: `Compiler: ${contract.compiler}`,
+      description: "Reported compiler version from verification metadata.",
+      scoreImpact: 0,
+      evidence: [{ reason: `compiler=${contract.compiler}`, source: src }],
     });
   }
 

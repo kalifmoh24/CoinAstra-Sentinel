@@ -9,6 +9,7 @@
 html,
 body {
   min-height: 100%;
+  min-height: 100dvh;
 }
 
 body {
@@ -16,6 +17,9 @@ body {
   background-image:
     radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59, 130, 246, 0.18), transparent),
     radial-gradient(ellipse 40% 30% at 100% 0%, rgba(34, 211, 238, 0.08), transparent);
+  /* Safe areas for notched phones / PWA standalone */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 @layer utilities {
@@ -31,4 +35,11 @@ body {
 
 .animate-pulse-step {
   animation: pulse-step 1.2s ease-in-out infinite;
+}
+
+/* Larger tap targets on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  a, button {
+    -webkit-tap-highlight-color: transparent;
+  }
 }

@@ -19,6 +19,7 @@ import { analyzeWallet } from "./wallet";
 import { analyzeApprovals } from "./approvals";
 import { analyzeExposure } from "./exposure";
 import { withRecommendations } from "./recommendations";
+import { RISK_ENGINE_VERSION } from "./version";
 
 export interface EngineInput {
   id: string;
@@ -163,6 +164,7 @@ export function runRiskEngine(input: EngineInput): ScanResult {
     inputType: input.inputType,
     chain: input.chain,
     demo: input.demo,
+    engineVersion: RISK_ENGINE_VERSION,
     score,
     band,
     categories,

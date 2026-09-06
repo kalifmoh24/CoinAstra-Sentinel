@@ -1,5 +1,7 @@
 import type { Finding, TokenApproval, WalletData } from "../types";
 
+/** P-AE-006: impacts aligned to wallet/contract bands (info~4–6, moderate~8–14, high~16–25, critical~35+). */
+
 const RISKY_SPENDER =
   /mixer|tornado|privacy|blender|drain|phishing|unknown/i;
 
@@ -18,7 +20,7 @@ export function analyzeApprovals(wallet: WalletData): Finding[] {
       title: "Insufficient data: token allowances",
       description:
         "No ERC-20 allowance inventory available from providers. Treat approval risk as unknown — not clear.",
-      scoreImpact: 8,
+      scoreImpact: 6,
       evidence: [{ reason: "approvals=null|missing", source: src }],
       recommendation:
         "Connect a token-allowance data source or verify approvals manually on a primary explorer before trusting this wallet.",
@@ -72,7 +74,7 @@ function findingsForApproval(a: TokenApproval, fallbackSrc: string): Finding[] {
       severity: "high",
       title: "Unlimited token allowance",
       description: `Unlimited allowance from ${a.token} to spender ${a.spender}.${demoNote}`,
-      scoreImpact: 22,
+      scoreImpact: 20,
       evidence: a.evidence.length
         ? a.evidence
         : [{ reason: "unlimited=true", source: src, raw: { token: a.token, spender: a.spender } }],
@@ -107,7 +109,7 @@ function findingsForApproval(a: TokenApproval, fallbackSrc: string): Finding[] {
         severity: "moderate",
         title: "Stale token allowance",
         description: `Allowance last seen ${a.lastSeen} (>180 days) for ${a.token} → ${a.spender}.${demoNote}`,
-        scoreImpact: 10,
+        scoreImpact: 8,
         evidence: [
           ...(a.evidence ?? []),
           { reason: `lastSeen=${a.lastSeen}`, source: src, raw: { ageDays: Math.round(age / 86400000) } },

@@ -83,6 +83,21 @@ export interface ScanResult {
   activity?: WalletActivityItem[];
   /** Token/contract header metadata when available (never invent facts). */
   subject?: SubjectMeta;
+  txMeta?: {
+    from?: string | null;
+    to?: string | null;
+    valueEth?: number | null;
+    method?: string | null;
+    status?: string | null;
+    timestamp?: string | null;
+    interactsWithContract?: boolean;
+  };
+  walletMeta?: {
+    firstSeen?: string | null;
+    txCount?: number | null;
+    balanceEth?: number | null;
+    labels?: string[];
+  };
 }
 
 export interface WalletData {

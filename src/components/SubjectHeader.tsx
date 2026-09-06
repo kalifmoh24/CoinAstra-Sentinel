@@ -17,7 +17,7 @@ export function SubjectHeader({ subject }: { subject: SubjectMeta }) {
           <p className="text-base font-medium text-white sm:text-lg">{subject.name}</p>
         )}
         {subject.symbol && (
-          <span className="rounded-full border border-white/10 bg-ink-800/60 px-2 py-0.5 font-mono text-xs text-accent-cyan">
+          <span className="rounded-full border border-white/10 bg-ink-800/60 px-2 py-0.5 font-mono text-xs text-accent-purple">
             {subject.symbol}
           </span>
         )}

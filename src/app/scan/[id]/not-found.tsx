@@ -4,10 +4,10 @@ export default function ScanNotFound() {
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-6xl items-center justify-center overflow-x-hidden px-4 py-16 sm:px-6">
       <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-ink-900/70 p-8 text-center shadow-glow">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-cyan text-sm font-bold text-ink-950">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-violet text-sm font-bold text-ink-950">
           CA
         </div>
-        <p className="mt-6 text-xs uppercase tracking-wider text-accent-cyan">Not found</p>
+        <p className="mt-6 text-xs uppercase tracking-wider text-accent-purple">Not found</p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">
           Scan result missing
         </h1>
@@ -24,7 +24,7 @@ export default function ScanNotFound() {
           </Link>
           <Link
             href="/"
-            className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-gradient-to-r from-accent to-sky-500 px-5 text-sm font-semibold text-white shadow-lg shadow-accent/20 transition hover:brightness-110"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-gradient-to-r from-accent to-accent-violet px-5 text-sm font-semibold text-white shadow-lg shadow-accent/20 transition hover:brightness-110"
           >
             Home search
           </Link>

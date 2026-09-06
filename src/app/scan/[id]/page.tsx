@@ -28,7 +28,7 @@ export default async function ScanPage({ params }: Props) {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 overflow-x-hidden px-4 py-3 text-sm sm:px-6">
           <Link
             href={newScanHref}
-            className="inline-flex min-h-[44px] items-center text-accent-cyan hover:underline"
+            className="inline-flex min-h-[44px] items-center text-accent-purple hover:underline"
           >
             ← New scan
           </Link>

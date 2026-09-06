@@ -9,12 +9,12 @@ export function StubPageShell({ item }: { item: NavItem }) {
     item.status === "live"
       ? "border-accent-emerald/40 bg-accent-emerald/10 text-accent-emerald"
       : item.status === "beta"
-        ? "border-accent-cyan/40 bg-accent-cyan/10 text-accent-cyan"
+        ? "border-accent-purple/40 bg-accent-purple/10 text-accent-purple"
         : "border-white/15 bg-ink-800/80 text-slate-400";
 
   return (
     <div className="mx-auto max-w-3xl overflow-x-hidden px-4 pb-36 pt-10 sm:px-6 sm:pb-16 sm:pt-14">
-      <p className="text-sm font-medium text-accent-cyan">CoinAstra platform</p>
+      <p className="text-sm font-medium text-accent-purple">CoinAstra platform</p>
       <div className="mt-2 flex flex-wrap items-center gap-3">
         <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">{item.label}</h1>
         <span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${badgeClass}`}>{badge}</span>
@@ -29,28 +29,28 @@ export function StubPageShell({ item }: { item: NavItem }) {
         <h2 className="text-sm font-semibold text-slate-200">What you can do today</h2>
         <ul className="mt-3 space-y-2 text-sm text-slate-400">
           <li className="flex gap-2">
-            <span className="text-accent-cyan">•</span>
+            <span className="text-accent-purple">•</span>
             <span>
               Run live scanners:{" "}
-              <Link href="/scan/wallet" className="text-accent-cyan hover:underline">
+              <Link href="/scan/wallet" className="text-accent-purple hover:underline">
                 Wallet
               </Link>
               ,{" "}
-              <Link href="/scan/token" className="text-accent-cyan hover:underline">
+              <Link href="/scan/token" className="text-accent-purple hover:underline">
                 Token
               </Link>
               ,{" "}
-              <Link href="/scan/contract" className="text-accent-cyan hover:underline">
+              <Link href="/scan/contract" className="text-accent-purple hover:underline">
                 Contract
               </Link>
               ,{" "}
-              <Link href="/scan/transaction" className="text-accent-cyan hover:underline">
+              <Link href="/scan/transaction" className="text-accent-purple hover:underline">
                 Transaction Preview
               </Link>
             </span>
           </li>
           <li className="flex gap-2">
-            <span className="text-accent-cyan">•</span>
+            <span className="text-accent-purple">•</span>
             <span>DEMO fixtures stay labeled DEMO. Missing data surfaces as Insufficient data.</span>
           </li>
         </ul>
@@ -63,7 +63,7 @@ export function StubPageShell({ item }: { item: NavItem }) {
           </Link>
         ) : (
           <Link
-            href="/"
+            href="/dashboard"
             className="mt-5 inline-flex min-h-[44px] items-center rounded-xl bg-accent/90 px-4 py-2.5 text-sm font-semibold text-white hover:bg-accent"
           >
             Go to homepage search

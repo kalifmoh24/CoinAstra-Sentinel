@@ -7,7 +7,7 @@ import { NAV_GROUPS, NAV_ITEMS, statusLabel, type NavStatus } from "@/lib/nav";
 
 function badgeClass(status: NavStatus) {
   if (status === "live") return "text-accent-emerald";
-  if (status === "beta") return "text-accent-cyan";
+  if (status === "beta") return "text-accent-purple";
   return "text-slate-500";
 }
 
@@ -43,7 +43,7 @@ export function MoreMenu({ open, onClose }: { open: boolean; onClose: () => void
       >
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/5 bg-ink-950/95 px-4 py-3 backdrop-blur">
           <div>
-            <p className="text-xs font-medium text-accent-cyan">CoinAstra</p>
+            <p className="text-xs font-medium text-accent-purple">CoinAstra</p>
             <h2 className="text-sm font-semibold text-white">All routes</h2>
           </div>
           <button
@@ -75,11 +75,18 @@ export function MoreMenu({ open, onClose }: { open: boolean; onClose: () => void
                           onClick={onClose}
                           className={`flex min-h-[44px] items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm transition ${
                             active
-                              ? "bg-accent/15 text-accent-cyan"
+                              ? "bg-accent/15 text-accent-purple"
                               : "text-slate-300 hover:bg-white/5 hover:text-white"
                           }`}
                         >
-                          <span>{item.label}</span>
+                          <span className="flex items-center gap-2">
+                            {item.label}
+                            {item.badgeDemo != null && (
+                              <span className="rounded-full bg-risk-critical px-1.5 py-0.5 text-[9px] font-bold text-white">
+                                {item.badgeDemo}
+                              </span>
+                            )}
+                          </span>
                           <span className={`shrink-0 text-[10px] font-medium ${badgeClass(item.status)}`}>
                             {statusLabel(item.status)}
                           </span>

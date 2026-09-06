@@ -29,7 +29,7 @@ export function WhatSentinelChecks() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <div className="mb-8 max-w-2xl">
-        <p className="text-sm font-medium text-accent-cyan">Coverage</p>
+        <p className="text-sm font-medium text-accent-purple">Coverage</p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
           What Sentinel Checks
         </h2>

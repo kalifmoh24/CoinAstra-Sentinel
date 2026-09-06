@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
-import { Nav } from "@/components/Nav";
+import { AppShell } from "@/components/AppShell";
 import { BottomNav } from "@/components/BottomNav";
 import "./globals.css";
 
@@ -54,11 +54,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="min-h-screen overflow-x-hidden font-sans">
-        <Nav />
-        <main className="pb-20 sm:pb-0">{children}</main>
-        <footer className="mb-16 border-t border-white/5 py-8 text-center text-xs text-slate-600 sm:mb-0">
-          © {new Date().getFullYear()} CoinAstra platform · Sentinel security engine · coinastra.io
-        </footer>
+        <AppShell>
+          <main className="pb-20 lg:pb-0">{children}</main>
+          <footer className="mb-16 border-t border-white/5 px-4 py-6 text-xs text-slate-600 lg:mb-0 sm:px-6">
+            <div className="mx-auto flex max-w-7xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p>© {new Date().getFullYear()} CoinAstra · Sentinel security engine</p>
+              <div className="flex flex-wrap gap-3">
+                <a href="/api-integrations" className="hover:text-slate-400">
+                  Documentation
+                </a>
+                <a href="/api-integrations" className="hover:text-slate-400">
+                  API
+                </a>
+                <a href="/pricing" className="hover:text-slate-400">
+                  Support
+                </a>
+                <span className="text-slate-700">Privacy</span>
+                <span className="text-slate-700">Terms</span>
+              </div>
+            </div>
+          </footer>
+        </AppShell>
         <BottomNav />
       </body>
     </html>

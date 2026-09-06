@@ -1,18 +1,20 @@
-/** Locked CoinAstra IA — all primary nav items (Mohamed). */
+/** Locked CoinAstra IA — sidebar groups match product mockups. */
 
 export type NavStatus = "live" | "beta" | "soon";
+
+export type NavGroupId = "dashboard" | "scanners" | "intel" | "portfolio" | "more";
 
 export type NavItem = {
   href: string;
   label: string;
-  /** Short label for bottom bar / compact UI */
   shortLabel?: string;
   status: NavStatus;
   description: string;
-  /** Related live scanner when this is a stub */
   relatedHref?: string;
   relatedLabel?: string;
-  group: "platform" | "scanners" | "intel" | "security" | "integrations";
+  group: NavGroupId;
+  /** Show notification badge count in sidebar (DEMO) */
+  badgeDemo?: number;
 };
 
 export const NAV_ITEMS: NavItem[] = [
@@ -20,37 +22,10 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/dashboard",
     label: "Dashboard",
     shortLabel: "Home",
-    status: "beta",
+    status: "live",
     description:
-      "Your CoinAstra command center — overview of recent Sentinel scans and watch items. No invented market prices.",
-    group: "platform",
-  },
-  {
-    href: "/markets",
-    label: "Markets",
-    status: "soon",
-    description:
-      "Market context for assets you already researched — not price-prediction charts or signal spam.",
-    group: "platform",
-  },
-  {
-    href: "/portfolio",
-    label: "Portfolio",
-    status: "soon",
-    description:
-      "Connect holdings later to surface security exposure. Sentinel assesses risk; it does not invent balances.",
-    group: "platform",
-  },
-  {
-    href: "/ai-intelligence",
-    label: "AI Intelligence",
-    shortLabel: "AI Intel",
-    status: "beta",
-    description:
-      "How Sentinel AI explains evidence-backed findings. AI never invents blockchain facts or risk scores.",
-    relatedHref: "/",
-    relatedLabel: "Run a scan",
-    group: "intel",
+      "Your CoinAstra command center — overview of recent Sentinel scans and watch items. DEMO widgets are labeled.",
+    group: "dashboard",
   },
   {
     href: "/scan/wallet",
@@ -86,6 +61,50 @@ export const NAV_ITEMS: NavItem[] = [
     group: "scanners",
   },
   {
+    href: "/approval-checker",
+    label: "Approval Checker",
+    shortLabel: "Approvals",
+    status: "beta",
+    description:
+      "Review allowance and approval risk patterns. Use Contract / Token scanners for live checks today.",
+    relatedHref: "/scan/token",
+    relatedLabel: "Token Scanner",
+    group: "scanners",
+  },
+  {
+    href: "/exposure-checker",
+    label: "Exposure Checker",
+    shortLabel: "Exposure",
+    status: "beta",
+    description:
+      "Map counterparty and contract exposure from scan evidence. DEMO fixtures stay labeled DEMO.",
+    relatedHref: "/scan/wallet",
+    relatedLabel: "Wallet Scanner",
+    group: "scanners",
+  },
+  {
+    href: "/ai-agent-firewall",
+    label: "AI Agent Firewall",
+    shortLabel: "Firewall",
+    status: "soon",
+    description:
+      "Policy layer for AI agents that propose on-chain actions — fail-closed intent, no auto-signing.",
+    relatedHref: "/scan/transaction",
+    relatedLabel: "Transaction Preview",
+    group: "scanners",
+  },
+  {
+    href: "/ai-security-analyst",
+    label: "AI Security Analyst",
+    shortLabel: "Analyst",
+    status: "beta",
+    description:
+      "Ask Sentinel AI about a completed scan's findings. Explanations are grounded in engine evidence only.",
+    relatedHref: "/scan/contract",
+    relatedLabel: "Contract Scanner",
+    group: "intel",
+  },
+  {
     href: "/risk-intel",
     label: "Risk Intel",
     status: "beta",
@@ -102,7 +121,8 @@ export const NAV_ITEMS: NavItem[] = [
     description: "Monitoring and alert rules for watched addresses and contracts — scaffolding only for now.",
     relatedHref: "/watchlist",
     relatedLabel: "Watchlist",
-    group: "platform",
+    group: "intel",
+    badgeDemo: 8,
   },
   {
     href: "/watchlist",
@@ -111,62 +131,7 @@ export const NAV_ITEMS: NavItem[] = [
     description: "Save wallets, tokens, and contracts to revisit. No fake price ticks or signal spam.",
     relatedHref: "/scan/token",
     relatedLabel: "Token Scanner",
-    group: "platform",
-  },
-  {
-    href: "/exposure-checker",
-    label: "Exposure Checker",
-    shortLabel: "Exposure",
-    status: "beta",
-    description:
-      "Map counterparty and contract exposure from scan evidence. DEMO fixtures stay labeled DEMO.",
-    relatedHref: "/scan/wallet",
-    relatedLabel: "Wallet Scanner",
-    group: "security",
-  },
-  {
-    href: "/ai-security-analyst",
-    label: "AI Security Analyst",
-    shortLabel: "Analyst",
-    status: "beta",
-    description:
-      "Ask Sentinel AI about a completed scan's findings. Explanations are grounded in engine evidence only.",
-    relatedHref: "/scan/contract",
-    relatedLabel: "Contract Scanner",
-    group: "security",
-  },
-  {
-    href: "/transaction-simulator",
-    label: "Transaction Simulator",
-    shortLabel: "Simulate",
-    status: "soon",
-    description:
-      "Simulate call outcomes without broadcasting. Companion to Transaction Preview — never executes on-chain.",
-    relatedHref: "/scan/transaction",
-    relatedLabel: "Transaction Preview",
-    group: "security",
-  },
-  {
-    href: "/approval-checker",
-    label: "Approval Checker",
-    shortLabel: "Approvals",
-    status: "beta",
-    description:
-      "Review allowance and approval risk patterns. Use Contract / Token scanners for live checks today.",
-    relatedHref: "/scan/token",
-    relatedLabel: "Token Scanner",
-    group: "security",
-  },
-  {
-    href: "/ai-agent-firewall",
-    label: "AI Agent Firewall",
-    shortLabel: "Firewall",
-    status: "soon",
-    description:
-      "Policy layer for AI agents that propose on-chain actions — fail-closed intent, no auto-signing.",
-    relatedHref: "/scan/transaction",
-    relatedLabel: "Transaction Preview",
-    group: "security",
+    group: "intel",
   },
   {
     href: "/dex-intelligence",
@@ -181,7 +146,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/launchpad-intelligence",
-    label: "Launchpad Intelligence",
+    label: "Launchpad Intel",
     shortLabel: "Launchpad",
     status: "soon",
     description:
@@ -189,6 +154,52 @@ export const NAV_ITEMS: NavItem[] = [
     relatedHref: "/scan/contract",
     relatedLabel: "Contract Scanner",
     group: "intel",
+  },
+  {
+    href: "/ai-intelligence",
+    label: "AI Intelligence",
+    shortLabel: "AI Intel",
+    status: "beta",
+    description:
+      "How Sentinel AI explains evidence-backed findings. AI never invents blockchain facts or risk scores.",
+    relatedHref: "/dashboard",
+    relatedLabel: "Dashboard",
+    group: "intel",
+  },
+  {
+    href: "/portfolio",
+    label: "Portfolio Overview",
+    shortLabel: "Portfolio",
+    status: "soon",
+    description:
+      "Connect holdings later to surface security exposure. Sentinel assesses risk; it does not invent balances.",
+    group: "portfolio",
+  },
+  {
+    href: "/holdings",
+    label: "Holdings",
+    status: "soon",
+    description: "Holdings list for connected wallets — scaffolding. No invented balances.",
+    relatedHref: "/portfolio",
+    relatedLabel: "Portfolio Overview",
+    group: "portfolio",
+  },
+  {
+    href: "/performance",
+    label: "Performance",
+    status: "soon",
+    description: "Performance views when portfolio data is connected — scaffolding only.",
+    relatedHref: "/portfolio",
+    relatedLabel: "Portfolio Overview",
+    group: "portfolio",
+  },
+  {
+    href: "/markets",
+    label: "Markets",
+    status: "soon",
+    description:
+      "Market context for assets you already researched — not price-prediction charts or signal spam. DEMO figures stay labeled.",
+    group: "portfolio",
   },
   {
     href: "/api-integrations",
@@ -199,24 +210,51 @@ export const NAV_ITEMS: NavItem[] = [
       "Programmatic access to Sentinel scans. v1 stubs exist for wallet, token, contract, and transaction.",
     relatedHref: "/pricing",
     relatedLabel: "Pricing",
-    group: "integrations",
+    group: "more",
+  },
+  {
+    href: "/settings",
+    label: "Settings",
+    status: "soon",
+    description: "Account and preference settings — scaffolding. No payments processed here.",
+    relatedHref: "/pricing",
+    relatedLabel: "Pricing",
+    group: "more",
+  },
+  {
+    href: "/pricing",
+    label: "Pricing",
+    status: "beta",
+    description: "Plan tiers. Payments are stubbed — no real charges.",
+    group: "more",
+  },
+  {
+    href: "/transaction-simulator",
+    label: "Transaction Simulator",
+    shortLabel: "Simulate",
+    status: "soon",
+    description:
+      "Simulate call outcomes without broadcasting. Companion to Transaction Preview — never executes on-chain.",
+    relatedHref: "/scan/transaction",
+    relatedLabel: "Transaction Preview",
+    group: "scanners",
   },
 ];
 
-export const NAV_GROUPS: { id: NavItem["group"]; label: string }[] = [
-  { id: "platform", label: "Platform" },
-  { id: "scanners", label: "Scanners" },
+export const NAV_GROUPS: { id: NavGroupId; label: string }[] = [
+  { id: "dashboard", label: "Dashboard" },
+  { id: "scanners", label: "Security Scanners" },
   { id: "intel", label: "Intelligence" },
-  { id: "security", label: "Security" },
-  { id: "integrations", label: "Integrations" },
+  { id: "portfolio", label: "Portfolio" },
+  { id: "more", label: "More" },
 ];
 
-/** Primary bottom-bar slots (More opens the full IA). */
+/** Mobile bottom bar — Home / Markets / Portfolio / Alerts / More */
 export const BOTTOM_PRIMARY = [
-  { href: "/dashboard", label: "Dashboard", icon: "◈" },
-  { href: "/scan/wallet", label: "Wallet", icon: "W" },
-  { href: "/scan/token", label: "Token", icon: "T" },
-  { href: "/scan/transaction", label: "Tx", icon: "Ξ" },
+  { href: "/dashboard", label: "Home", icon: "⌂" },
+  { href: "/markets", label: "Markets", icon: "◈" },
+  { href: "/portfolio", label: "Portfolio", icon: "◫" },
+  { href: "/alerts", label: "Alerts", icon: "⚑" },
 ] as const;
 
 export function statusLabel(status: NavStatus): string {

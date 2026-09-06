@@ -188,3 +188,4 @@ export { analyzeApprovals } from "./approvals";
 export { analyzeExposure } from "./exposure";
 export { analyzeSimulation, buildTxSimulation } from "./simulate";
 export { withRecommendations, recommendationForFinding, isDangerousPermissionFinding } from "./recommendations";
+export { runXRay, buildDemoXRay, buildInsufficientXRay, aggregateXRayOverall, XRAY_DIMS, XRAY_WEIGHTS } from "./xray";

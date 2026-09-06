@@ -28,10 +28,6 @@ body {
     text-wrap: balance;
   }
 
-  .break-evidence {
-    overflow-wrap: anywhere;
-    word-break: break-word;
-  }
 }
 
 @keyframes pulse-step {

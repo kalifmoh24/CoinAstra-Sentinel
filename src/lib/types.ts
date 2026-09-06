@@ -94,9 +94,12 @@ export interface WalletData {
   labels?: string[];
   interactions?: Array<{ address: string; label?: string; risk?: string }>;
   fundingSource?: { address: string; label?: string; risk?: string } | null;
-  rapidMovement?: boolean;
-  newContractInteractions?: number;
-  mixerExposure?: boolean;
+  /** true/false only when detected; null = not evaluated (never invent false-clean) */
+  rapidMovement?: boolean | null;
+  /** count when computed; null = not evaluated */
+  newContractInteractions?: number | null;
+  /** true/false only when detected; null = not evaluated (never invent false-clean) */
+  mixerExposure?: boolean | null;
   /** Recent activity rows when tx history is available. */
   activity?: WalletActivityItem[];
   demo?: boolean;

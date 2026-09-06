@@ -253,9 +253,9 @@ export function analyzeContract(
       category: "Security",
       severity: "critical",
       title: "Honeypot heuristic triggered",
-      description: "Sell/transfer simulation heuristics suggest possible honeypot behavior.",
+      description: "Structured honeypotHeuristic=true from provider data (sell/transfer simulation).",
       scoreImpact: 40,
-      evidence: [{ reason: "honeypotHeuristic=true", source: src }],
+      evidence: [{ reason: "flags.honeypotHeuristic=true", source: src, raw: { flags: contract.flags } }],
     });
   } else if (contract.flags?.honeypotHeuristic === false) {
     findings.push({
@@ -263,10 +263,20 @@ export function analyzeContract(
       category: "Security",
       severity: "positive",
       title: "No honeypot heuristic hit",
-      description: "Available heuristics did not flag honeypot behavior.",
+      description: "Structured honeypotHeuristic=false from provider data.",
       scoreImpact: -5,
       positive: true,
-      evidence: [{ reason: "honeypotHeuristic=false", source: src }],
+      evidence: [{ reason: "flags.honeypotHeuristic=false", source: src, raw: { flags: contract.flags } }],
+    });
+  } else if (contract.isContract && (contract.flags?.honeypotHeuristic === null || contract.flags?.honeypotHeuristic === undefined)) {
+    findings.push({
+      id: "honeypot-unknown",
+      category: "Security",
+      severity: "info",
+      title: "Insufficient data: honeypot heuristic",
+      description: "No structured honeypot heuristic result; treat as unknown, not safe.",
+      scoreImpact: 5,
+      evidence: [{ reason: "flags.honeypotHeuristic=null|missing", source: src, raw: { flags: contract.flags ?? null } }],
     });
   }
 

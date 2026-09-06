@@ -9,7 +9,8 @@ import {
 import { runRiskEngine } from "@/lib/engine";
 import { explainFindings } from "@/lib/ai/explain";
 import { recordScanAlerts } from "@/lib/live/watch";
-import { RISK_ENGINE_VERSION, type InputType, type ScanResult } from "@/lib/types";
+import { type InputType, type ScanResult } from "@/lib/types";
+import { RISK_ENGINE_VERSION } from "@/lib/engine/version";
 import { normalizeChain } from "@/lib/live/rpc";
 
 export type ScanType = "wallet" | "token" | "contract" | "transaction" | "auto";

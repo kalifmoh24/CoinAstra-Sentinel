@@ -1,22 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma, isDemoMode } from "@/lib/db";
-import { detectInputType, isEvmAddress, isTxHash, normalizeInput } from "@/lib/detect";
 import { checkAndIncrementRateLimit, clientKeyFromRequest } from "@/lib/rate-limit";
-import {
-  blockchainProvider,
-  contractAnalysisProvider,
-  marketProvider,
-  securityProvider,
-} from "@/lib/providers";
-import { runRiskEngine } from "@/lib/engine";
-import { explainFindings } from "@/lib/ai/explain";
-import type { InputType, ScanResult } from "@/lib/types";
+import { runScan, ScanRequestError } from "@/lib/services/scan";
 
 const BodySchema = z.object({
   input: z.string().min(1).max(128),
   chain: z.string().default("ethereum"),
-  /** Explicit scanner type from dedicated pages; "auto" uses detection. */
   type: z.enum(["wallet", "token", "contract", "transaction", "auto"]).optional().default("auto"),
 });
 
@@ -30,37 +19,6 @@ export async function POST(req: NextRequest) {
     const parsed = BodySchema.safeParse(json);
     if (!parsed.success) {
       return NextResponse.json({ error: "Invalid request", details: parsed.error.flatten() }, { status: 400 });
-    }
-
-    const input = normalizeInput(parsed.data.input);
-    const chain = parsed.data.chain || "ethereum";
-    const requestedType = parsed.data.type ?? "auto";
-
-    let inputType: InputType = detectInputType(input);
-    if (inputType === "unknown") {
-      return NextResponse.json(
-        { error: "Unrecognized input. Provide an EVM address (0x…40 hex) or transaction hash (0x…64 hex)." },
-        { status: 400 },
-      );
-    }
-
-    // Validate explicit type against input shape
-    if (requestedType === "transaction") {
-      if (!isTxHash(input)) {
-        return NextResponse.json(
-          { error: "Transaction scanner expects a 66-character tx hash (0x + 64 hex)." },
-          { status: 400 },
-        );
-      }
-      inputType = "transaction";
-    } else if (requestedType === "wallet" || requestedType === "token" || requestedType === "contract") {
-      if (!isEvmAddress(input)) {
-        return NextResponse.json(
-          { error: `${requestedType} scanner expects an EVM address (0x + 40 hex).` },
-          { status: 400 },
-        );
-      }
-      inputType = requestedType;
     }
 
     const ip =
@@ -81,106 +39,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const demo = isDemoMode();
-    let wallet = null;
-    let contract = null;
-    let token = null;
-    let tx = null;
-    let market = null;
-    let security = null;
-
-    if (requestedType === "transaction" || (requestedType === "auto" && isTxHash(input))) {
-      inputType = "transaction";
-      tx = await blockchainProvider.getTransaction(input, chain);
-      if (tx.to && isEvmAddress(tx.to)) {
-        const hasCode = await blockchainProvider.hasCode(tx.to, chain);
-        if (hasCode) {
-          contract = await contractAnalysisProvider.analyze(tx.to, chain);
-        }
-        wallet = await blockchainProvider.getWallet(tx.from || tx.to, chain);
-      }
-    } else if (requestedType === "wallet") {
-      inputType = "wallet";
-      wallet = await blockchainProvider.getWallet(input, chain);
-      security = await securityProvider.screenAddress(input);
-    } else if (requestedType === "token") {
-      inputType = "token";
-      contract = await contractAnalysisProvider.analyze(input, chain);
-      token = await contractAnalysisProvider.asToken(input, chain);
-      market = await marketProvider.getTokenMarket(input);
-    } else if (requestedType === "contract") {
-      inputType = "contract";
-      contract = await contractAnalysisProvider.analyze(input, chain);
-      // Enrich with token fields when available, but keep type as contract
-      token = await contractAnalysisProvider.asToken(input, chain);
-      market = await marketProvider.getTokenMarket(input);
-    } else if (isEvmAddress(input)) {
-      const hasCode = await blockchainProvider.hasCode(input, chain);
-      if (hasCode) {
-        inputType = "contract";
-        contract = await contractAnalysisProvider.analyze(input, chain);
-        token = await contractAnalysisProvider.asToken(input, chain);
-        market = await marketProvider.getTokenMarket(input);
-        if (token.symbol) inputType = "token";
-      } else {
-        inputType = "wallet";
-        wallet = await blockchainProvider.getWallet(input, chain);
-        security = await securityProvider.screenAddress(input);
-      }
-    }
-
-    const created = await prisma.scan.create({
-      data: {
-        input,
-        inputType,
-        chain,
-        demo,
-        score: 0,
-        band: "Moderate",
-        summaryJson: "{}",
-        resultJson: "{}",
-        clientIp: ip,
-        userAgent: req.headers.get("user-agent"),
-      },
+    const result = await runScan({
+      input: parsed.data.input,
+      chain: parsed.data.chain,
+      type: parsed.data.type,
+      ownerKey: rid,
+      clientIp: ip,
+      userAgent: req.headers.get("user-agent"),
     });
 
-    const draft = runRiskEngine({
-      id: created.id,
-      input,
-      inputType,
-      chain,
-      demo: demo || Boolean(wallet?.demo || contract?.demo || tx?.demo),
-      wallet,
-      contract,
-      token,
-      tx,
-      market,
-      security,
-      aiExplanation: "",
-      createdAt: created.createdAt.toISOString(),
-    });
-
-    const { disclaimer: _d, aiExplanation: _a, ...forAi } = draft;
-    const aiExplanation = await explainFindings(forAi);
-
-    const result: ScanResult = { ...draft, aiExplanation };
-
-    await prisma.scan.update({
-      where: { id: created.id },
-      data: {
-        score: result.score,
-        band: result.band,
-        demo: result.demo,
-        summaryJson: JSON.stringify({
-          score: result.score,
-          band: result.band,
-          inputType: result.inputType,
-        }),
-        resultJson: JSON.stringify(result),
-      },
-    });
-
-    const res = NextResponse.json({ id: created.id, result, remaining: rate.remaining });
+    const res = NextResponse.json({ id: result.id, result, remaining: rate.remaining });
     res.cookies.set("sentinel_rid", rid, {
       httpOnly: true,
       sameSite: "lax",
@@ -189,6 +57,9 @@ export async function POST(req: NextRequest) {
     });
     return res;
   } catch (err) {
+    if (err instanceof ScanRequestError) {
+      return NextResponse.json({ error: err.message }, { status: err.status });
+    }
     console.error("scan error", err);
     return NextResponse.json({ error: "Scan failed" }, { status: 500 });
   }

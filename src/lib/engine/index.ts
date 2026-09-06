@@ -14,6 +14,7 @@ import { analyzeContract } from "./contract";
 import { analyzeToken } from "./token";
 import { aggregateScore } from "./score";
 import { analyzeTransaction } from "./transaction";
+import { analyzeSimulation, buildTxSimulation } from "./simulate";
 import { analyzeWallet } from "./wallet";
 import { analyzeApprovals } from "./approvals";
 import { analyzeExposure } from "./exposure";
@@ -88,7 +89,13 @@ export function runRiskEngine(input: EngineInput): ScanResult {
     findings.push(...analyzeToken(input.token, input.market ?? undefined));
   }
 
-  if (input.tx) findings.push(...analyzeTransaction(input.tx));
+  if (input.tx) {
+    findings.push(...analyzeTransaction(input.tx));
+    const sim = buildTxSimulation(input.tx);
+    findings.push(...analyzeSimulation(sim, input.tx));
+    // stash on input.tx for return
+    input.tx = { ...input.tx, simulation: sim };
+  }
 
   if (findings.length === 0) {
     findings.push({
@@ -172,10 +179,12 @@ export function runRiskEngine(input: EngineInput): ScanResult {
     walletMeta,
     approvals: input.wallet?.approvals ?? null,
     holdings: input.wallet?.holdings ?? null,
+    simulation: input.tx?.simulation ?? null,
   };
 }
 
 export { analyzeWallet, analyzeContract, analyzeToken, analyzeTransaction, aggregateScore };
 export { analyzeApprovals } from "./approvals";
 export { analyzeExposure } from "./exposure";
+export { analyzeSimulation, buildTxSimulation } from "./simulate";
 export { withRecommendations, recommendationForFinding, isDangerousPermissionFinding } from "./recommendations";

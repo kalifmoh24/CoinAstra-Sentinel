@@ -48,6 +48,16 @@ const BY_ID: Record<string, string> = {
     "Concentration is not inherently malicious — size risk accordingly and watch approvals on the dominant token.",
   "exposure-via-unlimited-approval":
     "Revoke unlimited allowances on high-value tokens before treating exposure as contained.",
+  "sim-revert":
+    "Do not sign a similar transaction until the revert cause is understood.",
+  "sim-insufficient-data":
+    "Use Transaction Preview evidence and verify on a primary explorer before signing.",
+  "sim-unlimited-approval":
+    "Confirm spender and prefer exact allowances — Sentinel does not broadcast revokes.",
+  "sim-sensitive-method":
+    "Review the method and spender carefully; prefer a dry-run on a trusted simulator when available.",
+  "sim-value-out":
+    "Confirm outbound amounts independently — Sentinel does not invent receive or send quantities.",
   "contract-unverified":
     "Do not approve unlimited allowances until source is verified or audited by a party you trust.",
   "contract-new":

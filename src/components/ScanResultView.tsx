@@ -3,6 +3,7 @@ import { RiskScore } from "./RiskScore";
 import { Disclaimer } from "./Disclaimer";
 import { ApprovalsPanel } from "./ApprovalsPanel";
 import { ExposurePanel } from "./ExposurePanel";
+import { SimulationPanel } from "./SimulationPanel";
 import { SubjectHeader } from "./SubjectHeader";
 import { ScanResultTabs } from "./ScanResultTabs";
 import { TransactionPreviewPanel } from "./TransactionPreviewPanel";
@@ -216,6 +217,12 @@ export function ScanResultView({ result }: { result: ScanResult }) {
         </div>
       )}
       
+      {(result.inputType === "transaction" || result.simulation != null) && (
+        <div className="mt-6">
+          <SimulationPanel simulation={result.simulation} findings={result.findings} demo={result.demo} />
+        </div>
+      )}
+
       <Disclaimer />
     </div>
   );

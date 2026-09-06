@@ -8,6 +8,7 @@ import type {
   WalletActivityItem,
   WalletData,
   WalletHolding,
+  TxSimulation,
 } from "../types";
 
 /** DEMO fixtures — clearly labeled; used when DEMO_MODE or API keys missing. */
@@ -230,6 +231,57 @@ export const DEMO_TOKEN: TokenData = {
   liquidityUsd: 42000000,
 };
 
+
+export const DEMO_TX_SIMULATION: TxSimulation = {
+  status: "simulated",
+  steps: [
+    {
+      index: 0,
+      op: "approve",
+      to: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      selector: "0x095ea7b3",
+      valueEth: 0,
+      status: "ok",
+      evidence: [{ reason: "DEMO fixture simulation step", source: "DEMO_FIXTURE" }],
+      sources: ["DEMO_FIXTURE"],
+      demo: true,
+    },
+  ],
+  assetDeltas: [
+    {
+      token: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      symbol: "DUSDC",
+      direction: "out",
+      amount: null,
+      evidence: [
+        {
+          reason: "DEMO: outbound amount left null (Insufficient data pattern — never invent)",
+          source: "DEMO_FIXTURE",
+        },
+      ],
+      sources: ["DEMO_FIXTURE"],
+      demo: true,
+    },
+  ],
+  approvalDeltas: [
+    {
+      token: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      spender: "0x1111111254EEB25477B68fb85Ed929f73A960582",
+      change: "grant",
+      allowanceAfter: "unlimited",
+      unlimited: true,
+      evidence: [{ reason: "DEMO fixture unlimited approve", source: "DEMO_FIXTURE" }],
+      sources: ["DEMO_FIXTURE"],
+      demo: true,
+    },
+  ],
+  gasUsedEstimate: null,
+  revertReason: null,
+  evidence: [{ reason: "DEMO labeled simulation — not live eth_call", source: "DEMO_FIXTURE" }],
+  sources: ["DEMO_FIXTURE"],
+  demo: true,
+};
+
 export const DEMO_TX: TransactionData = {
   hash: "0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890",
   chain: "ethereum",
@@ -240,6 +292,7 @@ export const DEMO_TX: TransactionData = {
   status: "success",
   method: "approve",
   interactsWithContract: true,
+  simulation: DEMO_TX_SIMULATION,
   demo: true,
   sources: ["DEMO_FIXTURE"],
 };
@@ -291,5 +344,10 @@ export function demoTokenFor(address: string): TokenData {
 }
 
 export function demoTxFor(hash: string): TransactionData {
-  return { ...DEMO_TX, hash, demo: true };
+  return {
+    ...DEMO_TX,
+    hash,
+    simulation: { ...DEMO_TX_SIMULATION, steps: DEMO_TX_SIMULATION.steps ? [...DEMO_TX_SIMULATION.steps] : null },
+    demo: true,
+  };
 }

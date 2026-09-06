@@ -100,10 +100,10 @@ export interface ScanResult {
   };
   /** Structured ERC-20 approvals when evaluated (null/omit = not evaluated). */
   approvals?: TokenApproval[] | null;
-  /** Structured holdings when evaluated (null/omit = not evaluated). */
   holdings?: WalletHolding[] | null;
+  /** Tx simulation when run; null = not run */
+  simulation?: TxSimulation | null;
 }
-
 
 export interface TokenApproval {
   token: string;
@@ -199,6 +199,8 @@ export interface TransactionData {
   status?: string | null;
   method?: string | null;
   interactsWithContract?: boolean;
+  /** Attached simulation result when evaluated */
+  simulation?: TxSimulation | null;
   demo?: boolean;
   sources: string[];
 }
@@ -221,6 +223,61 @@ export interface SecurityIntel {
   notes?: string[];
   demo?: boolean;
   sources: string[];
+}
+
+
+export type SimulationStepStatus = "ok" | "revert" | "unknown";
+
+export interface SimulationStep {
+  index: number;
+  op: string;
+  to?: string | null;
+  selector?: string | null;
+  valueEth?: number | null;
+  status: SimulationStepStatus;
+  evidence: Evidence[];
+  sources: string[];
+  demo?: boolean;
+}
+
+export interface AssetDelta {
+  token: string;
+  symbol?: string | null;
+  direction: "in" | "out" | "unknown";
+  /** null = Insufficient data — never invent amounts */
+  amount: string | null;
+  amountRaw?: string | null;
+  evidence: Evidence[];
+  sources: string[];
+  demo?: boolean;
+}
+
+export interface ApprovalDelta {
+  token: string;
+  spender: string;
+  change: "grant" | "revoke" | "change" | "unknown";
+  /** null = Insufficient data — never invent allowance */
+  allowanceAfter: string | null;
+  unlimited?: boolean;
+  evidence: Evidence[];
+  sources: string[];
+  demo?: boolean;
+}
+
+export type TxSimulationStatus = "simulated" | "insufficient_data" | "unavailable";
+
+export interface TxSimulation {
+  status: TxSimulationStatus;
+  /** null = not evaluated; [] = evaluated empty */
+  steps: SimulationStep[] | null;
+  assetDeltas: AssetDelta[] | null;
+  approvalDeltas: ApprovalDelta[] | null;
+  /** null = not estimated — never invent gas */
+  gasUsedEstimate: string | null;
+  revertReason: string | null;
+  evidence: Evidence[];
+  sources: string[];
+  demo?: boolean;
 }
 
 export const DISCLAIMER =

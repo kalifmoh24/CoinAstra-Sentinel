@@ -134,14 +134,13 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/transaction-simulator",
     label: "Transaction Simulator",
     shortLabel: "Simulate",
-    status: "soon",
+    status: "live",
     description:
-      "Simulate call outcomes without broadcasting. Companion to Transaction Preview — never executes on-chain.",
+      "Simulate call outcomes without broadcasting. Fail-closed without eth_call/trace. DEMO labeled. Never executes.",
     relatedHref: "/scan/transaction",
     relatedLabel: "Transaction Preview",
     group: "scanners",
     icon: "flaskConical",
-    sidebarHidden: true,
   },
   {
     href: "/ai-security-analyst",

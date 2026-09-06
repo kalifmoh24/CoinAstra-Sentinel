@@ -2,6 +2,7 @@ import type { ContractData, TokenData } from "../types";
 import { blockchainProvider } from "./blockchain";
 import { demoTokenFor } from "../demo/fixtures";
 import { isDemoMode } from "../db";
+import { erc20Meta } from "../live/rpc";
 
 export interface ContractAnalysisProvider {
   analyze(address: string, chain?: string): Promise<ContractData>;
@@ -15,7 +16,6 @@ export const contractAnalysisProvider: ContractAnalysisProvider = {
   async asToken(address, chain = "ethereum") {
     if (isDemoMode()) return { ...demoTokenFor(address), chain };
     const base = await blockchainProvider.getContract(address, chain);
-    const { erc20Meta } = await import("../live/rpc");
     const meta = await erc20Meta(address, chain);
     return {
       ...base,

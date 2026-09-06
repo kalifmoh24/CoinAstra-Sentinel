@@ -15,10 +15,13 @@ export const contractAnalysisProvider: ContractAnalysisProvider = {
   async asToken(address, chain = "ethereum") {
     if (isDemoMode()) return { ...demoTokenFor(address), chain };
     const base = await blockchainProvider.getContract(address, chain);
+    const { erc20Meta } = await import("../live/rpc");
+    const meta = await erc20Meta(address, chain);
     return {
       ...base,
-      symbol: base.name?.slice(0, 6)?.toUpperCase() ?? null,
-      decimals: null,
+      name: meta.name || base.name,
+      symbol: meta.symbol ?? base.name?.slice(0, 8)?.toUpperCase() ?? null,
+      decimals: meta.decimals,
       totalSupply: null,
       holdersApprox: null,
       liquidityUsd: null,

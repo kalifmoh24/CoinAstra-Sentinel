@@ -280,5 +280,43 @@ export interface TxSimulation {
   demo?: boolean;
 }
 
+/** CoinAstra X-Ray — UI six dimensions (locked sequencing after Tx Simulator). */
+export type XRayDimensionId =
+  | "security"
+  | "tokenomics"
+  | "liquidity"
+  | "onchain"
+  | "market"
+  | "ecosystem";
+
+export type XRayDimStatus = "scored" | "insufficient_data" | "not_applicable" | "demo";
+
+export interface XRayDimensionScore {
+  id: XRayDimensionId;
+  /** null = gap / insufficient — never invent 0 as safe */
+  score: number | null;
+  band?: RiskBand;
+  summary: string;
+  findings: Finding[];
+  evidence: Evidence[];
+  weight: number;
+  status: XRayDimStatus;
+  demo?: boolean;
+}
+
+export interface XRayProfile {
+  subject: string;
+  chain: string;
+  dimensions: XRayDimensionScore[];
+  /** Weighted avg of scored dims only; null if none scored */
+  overallScore: number | null;
+  overallBand?: RiskBand;
+  gaps: XRayDimensionId[];
+  sources: string[];
+  demo: boolean;
+  disclaimer: string;
+  aiExplanation?: string;
+}
+
 export const DISCLAIMER =
   "Sentinel scores are analytical assessments based on available on-chain and provider data. They are not financial, legal, or security guarantees. Always do your own research before signing transactions or interacting with contracts.";

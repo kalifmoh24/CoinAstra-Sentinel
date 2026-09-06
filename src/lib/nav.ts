@@ -57,6 +57,16 @@ export const NAV_ITEMS: NavItem[] = [
     group: "dashboard",
     icon: "home",
   },
+    {
+    href: "/xray",
+    label: "X-Ray",
+    shortLabel: "X-Ray",
+    status: "live",
+    description:
+      "Unlock the Coin — six evidence-backed intelligence dimensions. Not price prediction. DEMO labeled; fail-closed on gaps.",
+    group: "scanners",
+    icon: "sparkles",
+  },
   {
     href: "/scan/wallet",
     label: "Wallet Scanner",

@@ -62,6 +62,8 @@ export interface SubjectMeta {
   deployer?: string | null;
 }
 
+export const RISK_ENGINE_VERSION = "1.0";
+
 export interface ScanResult {
   id: string;
   createdAt: string;
@@ -69,6 +71,8 @@ export interface ScanResult {
   inputType: InputType;
   chain: string;
   demo: boolean;
+  /** Deterministic engine formula version. Bump when weights/inputs change. */
+  engineVersion?: string;
   score: number;
   band: RiskBand;
   categories: CategoryScore[];
@@ -108,7 +112,7 @@ export interface ScanResult {
 export interface TokenApproval {
   token: string;
   spender: string;
-  /** Human-readable allowance when known; null = Insufficient data (never invent 0/unlimited) */
+  /** Human-readable allowance when known; null = Insufficient data — never invent 0/unlimited */
   allowance: string | null;
   allowanceRaw?: string | null;
   unlimited: boolean;

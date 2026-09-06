@@ -5,12 +5,9 @@ import type {
   WalletActivityItem,
   WalletData,
 } from "../types";
-import {
-  demoContractFor,
-  demoTxFor,
-  demoWalletFor,
-} from "../demo/fixtures";
+import { demoContractFor, demoTxFor, demoWalletFor } from "../demo/fixtures";
 import { isDemoMode } from "../db";
+import { ethGetBalanceWei, ethGetCode, ethRpc } from "../live/rpc";
 
 const EXPLORER = "https://api.etherscan.io/api";
 
@@ -28,8 +25,7 @@ type EtherscanTx = {
 
 async function etherscan<T>(params: Record<string, string>): Promise<T | null> {
   const key = process.env.ETHERSCAN_API_KEY;
-  if (!key) return null;
-  const qs = new URLSearchParams({ ...params, apikey: key });
+  const qs = new URLSearchParams({ ...params, ...(key ? { apikey: key } : {}) });
   try {
     const res = await fetch(`${EXPLORER}?${qs.toString()}`, { next: { revalidate: 60 } });
     if (!res.ok) return null;
@@ -59,12 +55,7 @@ function riskForTx(tx: EtherscanTx, walletAddress: string): ActivityRiskLevel {
   return "low";
 }
 
-function activityFromTxlist(
-  rows: EtherscanTx[],
-  walletAddress: string,
-  limit = 8,
-): WalletActivityItem[] {
-  // rows are ascending by timestamp when sort=asc — take newest first
+function activityFromTxlist(rows: EtherscanTx[], walletAddress: string, limit = 8): WalletActivityItem[] {
   const newest = [...rows].reverse().slice(0, limit);
   return newest.map((tx) => {
     const valueWei = tx.value ? Number(tx.value) : 0;
@@ -86,10 +77,20 @@ function activityFromTxlist(
   });
 }
 
+function weiToEth(wei: string | null): number | null {
+  if (!wei) return null;
+  try {
+    return Number(BigInt(wei)) / 1e18;
+  } catch {
+    return null;
+  }
+}
+
 export async function getEthereumWallet(address: string): Promise<WalletData> {
   if (isDemoMode()) return demoWalletFor(address);
 
-  const txlist = await etherscan<{ status: string; result: EtherscanTx[] }>({
+  const sources: string[] = [];
+  const txlist = await etherscan<{ status: string; result: EtherscanTx[] | string }>({
     module: "account",
     action: "txlist",
     address,
@@ -100,47 +101,69 @@ export async function getEthereumWallet(address: string): Promise<WalletData> {
     sort: "asc",
   });
 
-  const balance = await etherscan<{ status: string; result: string }>({
+  let firstSeen: string | null = null;
+  let txCount: number | null = null;
+  let activity: WalletActivityItem[] | undefined;
+
+  if (txlist && txlist.status === "1" && Array.isArray(txlist.result)) {
+    sources.push("etherscan.txlist");
+    const rows = txlist.result;
+    txCount = rows.length;
+    const first = rows[0];
+    firstSeen = first ? new Date(Number(first.timeStamp) * 1000).toISOString() : null;
+    activity = activityFromTxlist(rows, address);
+  } else if (txlist && txlist.status === "0" && typeof txlist.result === "string" && /no transactions/i.test(txlist.result)) {
+    sources.push("etherscan.txlist");
+    txCount = 0;
+    activity = [];
+  }
+
+  const balanceScan = await etherscan<{ status: string; result: string }>({
     module: "account",
     action: "balance",
     address,
     tag: "latest",
   });
-
-  if (!txlist || txlist.status !== "1") {
-    // Fall back to labeled demo rather than inventing facts
-    return { ...demoWalletFor(address), sources: ["DEMO_FIXTURE", "etherscan-insufficient"] };
+  let balanceEth: number | null = null;
+  if (balanceScan?.status === "1" && balanceScan.result != null) {
+    sources.push("etherscan.balance");
+    balanceEth = Number(balanceScan.result) / 1e18;
+  } else {
+    const wei = await ethGetBalanceWei(address, "ethereum");
+    if (wei) {
+      sources.push("public-rpc.eth_getBalance");
+      balanceEth = weiToEth(wei);
+    }
   }
 
-  const first = txlist.result[0];
-  const txCount = txlist.result.length;
-  const balanceEth =
-    balance?.status === "1" ? Number(balance.result) / 1e18 : null;
-  const activity = activityFromTxlist(txlist.result, address);
+  if (!sources.length) sources.push("insufficient");
 
   return {
     address,
     chain: "ethereum",
-    firstSeen: first ? new Date(Number(first.timeStamp) * 1000).toISOString() : null,
+    firstSeen,
     txCount,
     balanceEth,
     interactions: [],
     fundingSource: null,
-    // Threat heuristics not derived from txlist alone — null = unknown, not clean
     rapidMovement: null,
     newContractInteractions: null,
     mixerExposure: null,
     activity,
-    // ERC-20 allowances/holdings need token APIs / eth_call — fail closed (null = not evaluated)
     approvals: null,
     holdings: null,
     demo: false,
-    sources: ["etherscan"],
+    sources,
   };
 }
 
 export async function getEthereumContract(address: string): Promise<ContractData> {
   if (isDemoMode()) return demoContractFor(address);
+
+  const sources: string[] = [];
+  const code = await ethGetCode(address, "ethereum");
+  if (code != null) sources.push("public-rpc.eth_getCode");
+  const isContract = Boolean(code && code !== "0x");
 
   const info = await etherscan<{
     status: string;
@@ -158,22 +181,19 @@ export async function getEthereumContract(address: string): Promise<ContractData
     address,
   });
 
-  if (!info || info.status !== "1" || !info.result?.[0]) {
-    return { ...demoContractFor(address), sources: ["DEMO_FIXTURE", "etherscan-insufficient"] };
-  }
+  const row = info?.status === "1" ? info.result?.[0] : undefined;
+  if (row) sources.push("etherscan.getsourcecode");
 
-  const row = info.result[0];
   let abi: unknown[] | null = null;
   try {
-    abi = row.ABI && row.ABI !== "Contract source code not verified" ? JSON.parse(row.ABI) : null;
+    abi = row?.ABI && row.ABI !== "Contract source code not verified" ? JSON.parse(row.ABI) : null;
   } catch {
     abi = null;
   }
 
-  const verified = Boolean(row.SourceCode && row.SourceCode.length > 0);
+  const verified = Boolean(row?.SourceCode && row.SourceCode.length > 0);
   const abiText = JSON.stringify(abi ?? []);
 
-  // Creator/deployer only when explorer returns it — do not invent
   const creation = await etherscan<{
     status: string;
     result: Array<{ contractCreator?: string; contractAddress?: string }>;
@@ -186,78 +206,112 @@ export async function getEthereumContract(address: string): Promise<ContractData
     creation?.status === "1" && creation.result?.[0]?.contractCreator
       ? creation.result[0].contractCreator
       : null;
+  if (deployer) sources.push("etherscan.getcontractcreation");
+
+  if (!sources.length) sources.push("insufficient");
 
   return {
     address,
     chain: "ethereum",
-    isContract: true,
-    verified,
-    name: row.ContractName || null,
-    compiler: row.CompilerVersion || null,
+    isContract,
+    verified: row ? verified : null,
+    name: row?.ContractName || null,
+    compiler: row?.CompilerVersion || null,
     createdAt: null,
-    isProxy: row.Proxy === "1",
-    implementation: row.Implementation || null,
+    isProxy: row ? row.Proxy === "1" : null,
+    implementation: row?.Implementation || null,
     owner: null,
     deployer,
     abi,
-    sourceCode: row.SourceCode ? "[verified source present]" : null,
+    sourceCode: row?.SourceCode ? "[verified source present]" : null,
     flags: {
       mint: /mint/i.test(abiText),
       pause: /pause/i.test(abiText),
       blacklist: /blacklist/i.test(abiText),
-      upgradeable: row.Proxy === "1",
+      upgradeable: row ? row.Proxy === "1" : null,
       honeypotHeuristic: null,
     },
     demo: false,
-    sources: ["etherscan"],
+    sources,
   };
 }
 
 export async function getEthereumTransaction(hash: string): Promise<TransactionData> {
   if (isDemoMode()) return demoTxFor(hash);
 
-  const tx = await etherscan<{
-    status: string;
-    result: {
-      from?: string;
-      to?: string;
-      value?: string;
-      timeStamp?: string;
-      methodId?: string;
-      functionName?: string;
-      isError?: string;
-      contractAddress?: string;
-    };
-  }>({
-    module: "proxy",
-    action: "eth_getTransactionByHash",
-    txhash: hash,
-  });
-
-  // etherscan proxy shape varies — if insufficient, DEMO-label fallback
-  if (!tx || !("result" in tx) || !tx.result) {
-    return { ...demoTxFor(hash), sources: ["DEMO_FIXTURE", "etherscan-insufficient"] };
-  }
-
-  const r = tx.result as {
+  const sources: string[] = [];
+  const viaRpc = await ethRpc<{
     from?: string;
     to?: string;
     value?: string;
-    blockNumber?: string;
     input?: string;
-  };
+    blockNumber?: string;
+  }>("eth_getTransactionByHash", [hash], "ethereum");
+
+  let from: string | null = null;
+  let to: string | null = null;
+  let valueEth: number | null = null;
+  let method: string | null = null;
+  let interactsWithContract = false;
+  let timestamp: string | null = null;
+  let status: string | null = "unknown";
+
+  if (viaRpc) {
+    sources.push("public-rpc.eth_getTransactionByHash");
+    from = viaRpc.from ?? null;
+    to = viaRpc.to ?? null;
+    valueEth = weiToEth(viaRpc.value ?? null);
+    method = viaRpc.input && viaRpc.input !== "0x" ? viaRpc.input.slice(0, 10) : null;
+    interactsWithContract = Boolean(viaRpc.input && viaRpc.input !== "0x");
+
+    const receipt = await ethRpc<{ status?: string; blockNumber?: string }>(
+      "eth_getTransactionReceipt",
+      [hash],
+      "ethereum",
+    );
+    if (receipt) {
+      sources.push("public-rpc.eth_getTransactionReceipt");
+      if (receipt.status === "0x1") status = "success";
+      else if (receipt.status === "0x0") status = "reverted";
+    }
+    if (viaRpc.blockNumber) {
+      const block = await ethRpc<{ timestamp?: string }>("eth_getBlockByNumber", [viaRpc.blockNumber, false], "ethereum");
+      if (block?.timestamp) {
+        sources.push("public-rpc.eth_getBlockByNumber");
+        timestamp = new Date(Number(BigInt(block.timestamp)) * 1000).toISOString();
+      }
+    }
+  } else {
+    const tx = await etherscan<{
+      result?: { from?: string; to?: string; value?: string; input?: string };
+    }>({
+      module: "proxy",
+      action: "eth_getTransactionByHash",
+      txhash: hash,
+    });
+    if (tx?.result) {
+      sources.push("etherscan.eth_getTransactionByHash");
+      from = tx.result.from ?? null;
+      to = tx.result.to ?? null;
+      valueEth = weiToEth(tx.result.value ?? null);
+      method = tx.result.input && tx.result.input !== "0x" ? tx.result.input.slice(0, 10) : null;
+      interactsWithContract = Boolean(tx.result.input && tx.result.input !== "0x");
+    }
+  }
+
+  if (!sources.length) sources.push("insufficient");
 
   return {
     hash,
     chain: "ethereum",
-    from: r.from ?? null,
-    to: r.to ?? null,
-    valueEth: r.value ? Number(BigInt(r.value)) / 1e18 : null,
-    timestamp: null,
-    status: "unknown",
-    method: r.input && r.input !== "0x" ? r.input.slice(0, 10) : null,
-    interactsWithContract: Boolean(r.input && r.input !== "0x"),
+    from,
+    to,
+    valueEth,
+    timestamp,
+    status,
+    method,
+    interactsWithContract,
     demo: false,
-    sources: ["etherscan"],
+    sources,
   };
 }

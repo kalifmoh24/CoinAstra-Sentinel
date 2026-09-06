@@ -10,13 +10,13 @@ export default function TransactionScanPage() {
   return (
     <ScannerPageShell
       type="transaction"
-      title="Transaction preview"
-      subtitle="Analysis only. Sentinel never signs, broadcasts, or submits transactions."
+      title="Transaction Preview"
+      subtitle="Before you sign — analysis only. Sentinel never signs, broadcasts, simulates execution, or submits transactions."
       bullets={[
-        "Decoded method sensitivity (approve, ownership, upgrades)",
-        "Native value and contract-interaction context",
-        "Status and party evidence from providers",
-        "Pair with contract/wallet scans for deeper context",
+        "Swap-style summary fields when from/to/value/method exist in evidence",
+        "Risk gauge + band from deterministic scoring",
+        "Dangerous permissions and approval heuristics when present",
+        "Proceed Anyway stays disabled — Cancel returns here",
       ]}
     />
   );

@@ -88,7 +88,7 @@ export function TypedSearchBox({
   const submitBtn = (
     <button
       type="submit"
-      className="min-h-[48px] w-full rounded-xl bg-gradient-to-r from-accent to-sky-500 px-5 py-3.5 text-base font-semibold text-white shadow-lg shadow-accent/20 transition hover:brightness-110 active:scale-[0.99] sm:w-auto sm:min-w-[160px]"
+      className="min-h-[48px] w-full rounded-xl bg-gradient-to-r from-accent to-accent-violet px-5 py-3.5 text-base font-semibold text-white shadow-lg shadow-accent/20 transition hover:brightness-110 active:scale-[0.99] sm:w-auto sm:min-w-[160px]"
     >
       {meta.cta}
     </button>

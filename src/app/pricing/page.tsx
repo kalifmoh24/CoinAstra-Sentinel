@@ -34,7 +34,7 @@ export default function PricingPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
-        <p className="text-sm font-medium text-accent-cyan">Pricing</p>
+        <p className="text-sm font-medium text-accent-purple">Pricing</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
           Simple tiers. Payments later.
         </h1>

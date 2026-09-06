@@ -76,7 +76,7 @@ export function WalletActivityTimeline({
               </div>
               <div className="flex shrink-0 flex-wrap items-center gap-1.5">
                 {row.contractInteraction && (
-                  <span className="rounded-full border border-accent-cyan/30 bg-accent-cyan/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-accent-cyan">
+                  <span className="rounded-full border border-accent-purple/30 bg-accent-purple/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-accent-purple">
                     Contract
                   </span>
                 )}

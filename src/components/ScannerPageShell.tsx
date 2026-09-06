@@ -32,7 +32,7 @@ export function ScannerPageShell({
             href={l.href}
             className={`inline-flex min-h-[44px] items-center rounded-full border px-4 py-2.5 text-sm font-medium transition ${
               l.type === type
-                ? "border-accent/50 bg-accent/15 text-accent-cyan"
+                ? "border-accent/50 bg-accent/15 text-accent-purple"
                 : "border-white/10 bg-ink-900/50 text-slate-400 hover:border-white/20 hover:text-white"
             }`}
           >
@@ -41,14 +41,14 @@ export function ScannerPageShell({
         ))}
       </div>
 
-      <p className="text-sm font-medium text-accent-cyan">Dedicated scanner</p>
+      <p className="text-sm font-medium text-accent-purple">Dedicated scanner</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">{title}</h1>
       <p className="mt-3 text-base text-slate-400">{subtitle}</p>
 
       <ul className="mt-5 space-y-2 text-sm text-slate-400">
         {bullets.map((b) => (
           <li key={b} className="flex gap-2">
-            <span className="text-accent-cyan">•</span>
+            <span className="text-accent-purple">•</span>
             <span>{b}</span>
           </li>
         ))}
@@ -63,9 +63,9 @@ export function ScannerPageShell({
       </div>
 
       <p className="mt-4 text-center text-xs text-slate-600">
-        Prefer universal search?{" "}
-        <Link href="/" className="text-accent-cyan hover:underline">
-          Go to homepage
+        Prefer the dashboard?{" "}
+        <Link href="/dashboard" className="text-accent-purple hover:underline">
+          Open dashboard
         </Link>
       </p>
     </div>

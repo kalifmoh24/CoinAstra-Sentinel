@@ -2,10 +2,10 @@ export default function ScanResultLoading() {
   return (
     <div className="mx-auto max-w-6xl overflow-x-hidden px-4 py-16 sm:px-6">
       <div className="mx-auto max-w-lg text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-cyan text-sm font-bold text-ink-950 shadow-glow">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-violet text-sm font-bold text-ink-950 shadow-glow">
           CA
         </div>
-        <p className="mt-6 text-xs uppercase tracking-wider text-accent-cyan">Loading scan</p>
+        <p className="mt-6 text-xs uppercase tracking-wider text-accent-purple">Loading scan</p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">
           Retrieving evidence…
         </h1>

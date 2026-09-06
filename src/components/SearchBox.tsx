@@ -47,9 +47,9 @@ export function SearchBox({ stickyCta = false }: { stickyCta?: boolean }) {
   const submitBtn = (
     <button
       type="submit"
-      className="min-h-[48px] w-full rounded-xl bg-gradient-to-r from-accent to-sky-500 px-5 py-3.5 text-base font-semibold text-white shadow-lg shadow-accent/20 transition hover:brightness-110 active:scale-[0.99] sm:w-auto sm:min-w-[168px]"
+      className="min-h-[48px] w-full rounded-xl bg-gradient-to-r from-accent to-accent-violet px-5 py-3.5 text-base font-semibold text-white shadow-lg shadow-accent/30 transition hover:brightness-110 active:scale-[0.99] sm:w-auto sm:min-w-[168px]"
     >
-      Scan with Sentinel
+      Scan with Sentinel →
     </button>
   );
 

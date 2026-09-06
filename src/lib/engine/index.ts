@@ -120,6 +120,29 @@ export function runRiskEngine(input: EngineInput): ScanResult {
 
   const subject = buildSubject(input.inputType, input.chain, input.contract, input.token);
 
+  const txMeta =
+    input.inputType === "transaction" && input.tx
+      ? {
+          from: input.tx.from ?? null,
+          to: input.tx.to ?? null,
+          valueEth: input.tx.valueEth ?? null,
+          method: input.tx.method ?? null,
+          status: input.tx.status ?? null,
+          timestamp: input.tx.timestamp ?? null,
+          interactsWithContract: input.tx.interactsWithContract,
+        }
+      : undefined;
+
+  const walletMeta =
+    input.inputType === "wallet" && input.wallet
+      ? {
+          firstSeen: input.wallet.firstSeen ?? null,
+          txCount: input.wallet.txCount ?? null,
+          balanceEth: input.wallet.balanceEth ?? null,
+          labels: input.wallet.labels,
+        }
+      : undefined;
+
   return {
     id: input.id,
     createdAt: input.createdAt ?? new Date().toISOString(),
@@ -139,6 +162,8 @@ export function runRiskEngine(input: EngineInput): ScanResult {
     insufficientData: findings.every((f) => f.title.toLowerCase().includes("insufficient")),
     activity,
     subject,
+    txMeta,
+    walletMeta,
   };
 }
 

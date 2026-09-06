@@ -55,7 +55,7 @@ export function FindingsList({
                 </p>
                 {recommendation && (
                   <p className="mt-2 break-words rounded-lg border border-white/10 bg-ink-950/40 px-2.5 py-2 text-xs leading-relaxed text-slate-200">
-                    <span className="font-medium text-accent-cyan">Recommendation: </span>
+                    <span className="font-medium text-accent-purple">Recommendation: </span>
                     {recommendation}
                   </p>
                 )}

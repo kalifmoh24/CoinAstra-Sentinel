@@ -4,10 +4,58 @@ import type {
   SecurityIntel,
   TokenData,
   TransactionData,
+  WalletActivityItem,
   WalletData,
 } from "../types";
 
 /** DEMO fixtures — clearly labeled; used when DEMO_MODE or API keys missing. */
+
+export const DEMO_WALLET_ACTIVITY: WalletActivityItem[] = [
+  {
+    date: "2024-11-02T15:22:11.000Z",
+    amount: "0",
+    asset: "ETH",
+    from: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0",
+    to: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    riskLevel: "moderate",
+    contractInteraction: true,
+    hash: "0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890",
+    method: "approve",
+  },
+  {
+    date: "2024-10-18T09:11:00.000Z",
+    amount: "1.25",
+    asset: "ETH",
+    from: "0xDemoCEXHotWallet00000000000000000001",
+    to: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0",
+    riskLevel: "low",
+    contractInteraction: false,
+    hash: "0xdemo000000000000000000000000000000000000000000000000000000000001",
+    method: "transfer",
+  },
+  {
+    date: "2024-09-01T14:05:33.000Z",
+    amount: "0.4",
+    asset: "ETH",
+    from: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0",
+    to: "0xDemoMixerStub000000000000000000000001",
+    riskLevel: "high",
+    contractInteraction: true,
+    hash: "0xdemo000000000000000000000000000000000000000000000000000000000002",
+    method: "deposit",
+  },
+  {
+    date: "2024-08-12T11:40:00.000Z",
+    amount: "2.0",
+    asset: "ETH",
+    from: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0",
+    to: "0x1111111254EEB25477B68fb85Ed929f73A960582",
+    riskLevel: "low",
+    contractInteraction: true,
+    hash: "0xdemo000000000000000000000000000000000000000000000000000000000003",
+    method: "swap",
+  },
+];
 
 export const DEMO_WALLET: WalletData = {
   address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0",
@@ -28,6 +76,7 @@ export const DEMO_WALLET: WalletData = {
   rapidMovement: false,
   newContractInteractions: 3,
   mixerExposure: true,
+  activity: DEMO_WALLET_ACTIVITY,
   demo: true,
   sources: ["DEMO_FIXTURE"],
 };
@@ -43,6 +92,7 @@ export const DEMO_CONTRACT: ContractData = {
   isProxy: true,
   implementation: "0x43506849D7C04F9138D1A2050bbF3A0c054402dd",
   owner: "0xDemoOwnerMultisig0000000000000000001",
+  deployer: "0xDemoDeployer00000000000000000000000001",
   abi: [
     { type: "function", name: "mint", inputs: [{ type: "address" }, { type: "uint256" }] },
     { type: "function", name: "pause", inputs: [] },
@@ -101,7 +151,12 @@ export const DEMO_SECURITY: SecurityIntel = {
 };
 
 export function demoWalletFor(address: string): WalletData {
-  return { ...DEMO_WALLET, address, demo: true };
+  const activity = DEMO_WALLET_ACTIVITY.map((row) => ({
+    ...row,
+    from: row.from === DEMO_WALLET.address ? address : row.from,
+    to: row.to === DEMO_WALLET.address ? address : row.to,
+  }));
+  return { ...DEMO_WALLET, address, activity, demo: true };
 }
 
 export function demoContractFor(address: string): ContractData {

@@ -1,4 +1,10 @@
-import type { ContractData, TransactionData, WalletData } from "../types";
+import type {
+  ActivityRiskLevel,
+  ContractData,
+  TransactionData,
+  WalletActivityItem,
+  WalletData,
+} from "../types";
 import {
   demoContractFor,
   demoTxFor,
@@ -7,6 +13,18 @@ import {
 import { isDemoMode } from "../db";
 
 const EXPLORER = "https://api.etherscan.io/api";
+
+type EtherscanTx = {
+  timeStamp: string;
+  from?: string;
+  to?: string;
+  value?: string;
+  hash?: string;
+  input?: string;
+  functionName?: string;
+  isError?: string;
+  contractAddress?: string;
+};
 
 async function etherscan<T>(params: Record<string, string>): Promise<T | null> {
   const key = process.env.ETHERSCAN_API_KEY;
@@ -21,10 +39,57 @@ async function etherscan<T>(params: Record<string, string>): Promise<T | null> {
   }
 }
 
+function methodFromTx(tx: EtherscanTx): string | null {
+  if (tx.functionName && tx.functionName.trim()) {
+    return tx.functionName.split("(")[0]?.trim() || null;
+  }
+  if (tx.input && tx.input !== "0x" && tx.input.length >= 10) {
+    return tx.input.slice(0, 10);
+  }
+  return null;
+}
+
+function riskForTx(tx: EtherscanTx, walletAddress: string): ActivityRiskLevel {
+  const method = (methodFromTx(tx) ?? "").toLowerCase();
+  if (tx.isError === "1") return "moderate";
+  if (/approve|permit|increaseallowance|setapproval/.test(method)) return "moderate";
+  if (/selfdestruct|delegatecall|upgrade|blacklist|pause|mint/.test(method)) return "high";
+  const interacts = Boolean(tx.input && tx.input !== "0x");
+  if (interacts && tx.to && tx.to.toLowerCase() !== walletAddress.toLowerCase()) return "info";
+  return "low";
+}
+
+function activityFromTxlist(
+  rows: EtherscanTx[],
+  walletAddress: string,
+  limit = 8,
+): WalletActivityItem[] {
+  // rows are ascending by timestamp when sort=asc — take newest first
+  const newest = [...rows].reverse().slice(0, limit);
+  return newest.map((tx) => {
+    const valueWei = tx.value ? Number(tx.value) : 0;
+    const amount = Number.isFinite(valueWei) ? String(valueWei / 1e18) : null;
+    const contractInteraction = Boolean(
+      (tx.input && tx.input !== "0x") || (tx.contractAddress && tx.contractAddress !== ""),
+    );
+    return {
+      date: new Date(Number(tx.timeStamp) * 1000).toISOString(),
+      amount,
+      asset: "ETH",
+      from: tx.from ?? null,
+      to: tx.to ?? null,
+      riskLevel: riskForTx(tx, walletAddress),
+      contractInteraction,
+      hash: tx.hash ?? null,
+      method: methodFromTx(tx),
+    };
+  });
+}
+
 export async function getEthereumWallet(address: string): Promise<WalletData> {
   if (isDemoMode()) return demoWalletFor(address);
 
-  const txlist = await etherscan<{ status: string; result: Array<{ timeStamp: string }> }>({
+  const txlist = await etherscan<{ status: string; result: EtherscanTx[] }>({
     module: "account",
     action: "txlist",
     address,
@@ -51,6 +116,7 @@ export async function getEthereumWallet(address: string): Promise<WalletData> {
   const txCount = txlist.result.length;
   const balanceEth =
     balance?.status === "1" ? Number(balance.result) / 1e18 : null;
+  const activity = activityFromTxlist(txlist.result, address);
 
   return {
     address,
@@ -63,6 +129,7 @@ export async function getEthereumWallet(address: string): Promise<WalletData> {
     rapidMovement: false,
     newContractInteractions: 0,
     mixerExposure: false,
+    activity,
     demo: false,
     sources: ["etherscan"],
   };
@@ -102,6 +169,20 @@ export async function getEthereumContract(address: string): Promise<ContractData
   const verified = Boolean(row.SourceCode && row.SourceCode.length > 0);
   const abiText = JSON.stringify(abi ?? []);
 
+  // Creator/deployer only when explorer returns it — do not invent
+  const creation = await etherscan<{
+    status: string;
+    result: Array<{ contractCreator?: string; contractAddress?: string }>;
+  }>({
+    module: "contract",
+    action: "getcontractcreation",
+    contractaddresses: address,
+  });
+  const deployer =
+    creation?.status === "1" && creation.result?.[0]?.contractCreator
+      ? creation.result[0].contractCreator
+      : null;
+
   return {
     address,
     chain: "ethereum",
@@ -113,6 +194,7 @@ export async function getEthereumContract(address: string): Promise<ContractData
     isProxy: row.Proxy === "1",
     implementation: row.Implementation || null,
     owner: null,
+    deployer,
     abi,
     sourceCode: row.SourceCode ? "[verified source present]" : null,
     flags: {

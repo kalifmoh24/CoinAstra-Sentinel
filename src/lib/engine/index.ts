@@ -4,6 +4,7 @@ import type {
   MarketData,
   ScanResult,
   SecurityIntel,
+  SubjectMeta,
   TokenData,
   TransactionData,
   WalletData,
@@ -14,6 +15,7 @@ import { analyzeToken } from "./token";
 import { aggregateScore } from "./score";
 import { analyzeTransaction } from "./transaction";
 import { analyzeWallet } from "./wallet";
+import { withRecommendations } from "./recommendations";
 
 export interface EngineInput {
   id: string;
@@ -31,8 +33,37 @@ export interface EngineInput {
   createdAt?: string;
 }
 
+function buildSubject(
+  inputType: ScanResult["inputType"],
+  chain: string,
+  contract?: ContractData | TokenData | null,
+  token?: TokenData | null,
+): SubjectMeta | undefined {
+  if (inputType !== "token" && inputType !== "contract") return undefined;
+  const src = token ?? contract;
+  if (!src) return undefined;
+  const meta: SubjectMeta = { chain };
+  if (src.name != null) meta.name = src.name;
+  const symbol =
+    token?.symbol ??
+    ("symbol" in src ? (src as TokenData).symbol : undefined);
+  if (symbol != null) meta.symbol = symbol;
+  if (src.verified !== undefined) meta.verified = src.verified;
+  if (src.deployer != null) meta.deployer = src.deployer;
+  // Only attach when at least one subject field beyond chain is present
+  if (
+    meta.name == null &&
+    meta.symbol == null &&
+    meta.verified === undefined &&
+    meta.deployer == null
+  ) {
+    return undefined;
+  }
+  return meta;
+}
+
 export function runRiskEngine(input: EngineInput): ScanResult {
-  const findings: Finding[] = [];
+  let findings: Finding[] = [];
 
   if (input.wallet) findings.push(...analyzeWallet(input.wallet, input.security ?? undefined));
 
@@ -65,6 +96,8 @@ export function runRiskEngine(input: EngineInput): ScanResult {
     });
   }
 
+  findings = withRecommendations(findings);
+
   const { score, band, categories } = aggregateScore(findings);
   const dataSources = Array.from(
     new Set(
@@ -79,6 +112,13 @@ export function runRiskEngine(input: EngineInput): ScanResult {
       ].filter(Boolean),
     ),
   );
+
+  const activity =
+    input.inputType === "wallet" && input.wallet?.activity && input.wallet.activity.length > 0
+      ? input.wallet.activity
+      : undefined;
+
+  const subject = buildSubject(input.inputType, input.chain, input.contract, input.token);
 
   return {
     id: input.id,
@@ -97,7 +137,10 @@ export function runRiskEngine(input: EngineInput): ScanResult {
     dataSources,
     disclaimer: DISCLAIMER,
     insufficientData: findings.every((f) => f.title.toLowerCase().includes("insufficient")),
+    activity,
+    subject,
   };
 }
 
 export { analyzeWallet, analyzeContract, analyzeToken, analyzeTransaction, aggregateScore };
+export { withRecommendations, recommendationForFinding, isDangerousPermissionFinding } from "./recommendations";

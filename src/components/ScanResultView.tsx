@@ -4,6 +4,9 @@ import { CategoryBreakdown } from "./CategoryBreakdown";
 import { FindingsList } from "./FindingsList";
 import { AiExplanation } from "./AiExplanation";
 import { Disclaimer } from "./Disclaimer";
+import { WalletActivityTimeline } from "./WalletActivityTimeline";
+import { DangerousPermissions } from "./DangerousPermissions";
+import { SubjectHeader } from "./SubjectHeader";
 import { shortAddr } from "@/lib/utils";
 import Link from "next/link";
 
@@ -27,6 +30,10 @@ export function ScanResultView({ result }: { result: ScanResult }) {
   const partialEvidence =
     result.insufficientData === true ||
     result.findings.some((f) => f.title.toLowerCase().includes("insufficient"));
+  const showDangerous =
+    result.inputType === "token" || result.inputType === "contract";
+  const showActivity =
+    result.inputType === "wallet" && result.activity && result.activity.length > 0;
 
   return (
     <div className="mx-auto max-w-6xl space-y-5 overflow-x-hidden px-4 py-8 sm:space-y-6 sm:px-6 sm:py-10">
@@ -57,6 +64,10 @@ export function ScanResultView({ result }: { result: ScanResult }) {
         </p>
       </div>
 
+      {result.subject && (result.inputType === "token" || result.inputType === "contract") && (
+        <SubjectHeader subject={result.subject} />
+      )}
+
       {partialEvidence && (
         <div
           role="status"
@@ -74,9 +85,13 @@ export function ScanResultView({ result }: { result: ScanResult }) {
         <div className="min-w-0 space-y-4 sm:space-y-6 lg:col-span-2">
           <RiskScore score={result.score} band={result.band} demo={result.demo} />
           <CategoryBreakdown categories={result.categories} />
+          {showDangerous && <DangerousPermissions findings={result.findings} />}
         </div>
         <div className="min-w-0 space-y-4 sm:space-y-6 lg:col-span-3">
           <AiExplanation text={result.aiExplanation} demo={result.demo} />
+          {showActivity && (
+            <WalletActivityTimeline activity={result.activity!} demo={result.demo} />
+          )}
           <FindingsList
             title="Critical & high findings"
             findings={result.criticalFindings}

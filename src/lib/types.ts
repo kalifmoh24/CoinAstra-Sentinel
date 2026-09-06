@@ -12,6 +12,8 @@ export type RiskCategory =
 
 export type FindingSeverity = "critical" | "high" | "moderate" | "low" | "info" | "positive";
 
+export type ActivityRiskLevel = "critical" | "high" | "moderate" | "low" | "info" | "unknown";
+
 export interface Evidence {
   reason: string;
   source: string;
@@ -27,6 +29,8 @@ export interface Finding {
   scoreImpact: number;
   evidence: Evidence[];
   positive?: boolean;
+  /** Actionable guidance for critical/high findings (engine or id-mapped). */
+  recommendation?: string;
 }
 
 export interface CategoryScore {
@@ -34,6 +38,28 @@ export interface CategoryScore {
   score: number;
   weight: number;
   summary: string;
+}
+
+/** Recent wallet tx row when provider/demo fixtures supply history. */
+export interface WalletActivityItem {
+  date: string;
+  amount?: string | null;
+  asset?: string | null;
+  from?: string | null;
+  to?: string | null;
+  riskLevel?: ActivityRiskLevel;
+  contractInteraction?: boolean;
+  hash?: string | null;
+  method?: string | null;
+}
+
+/** Subject header fields for token/contract results — only when present in provider data. */
+export interface SubjectMeta {
+  name?: string | null;
+  symbol?: string | null;
+  chain?: string;
+  verified?: boolean | null;
+  deployer?: string | null;
 }
 
 export interface ScanResult {
@@ -53,6 +79,10 @@ export interface ScanResult {
   dataSources: string[];
   disclaimer: string;
   insufficientData?: boolean;
+  /** Wallet activity timeline when available from provider/demo. */
+  activity?: WalletActivityItem[];
+  /** Token/contract header metadata when available (never invent facts). */
+  subject?: SubjectMeta;
 }
 
 export interface WalletData {
@@ -67,6 +97,8 @@ export interface WalletData {
   rapidMovement?: boolean;
   newContractInteractions?: number;
   mixerExposure?: boolean;
+  /** Recent activity rows when tx history is available. */
+  activity?: WalletActivityItem[];
   demo?: boolean;
   sources: string[];
 }
@@ -82,6 +114,8 @@ export interface ContractData {
   isProxy?: boolean | null;
   implementation?: string | null;
   owner?: string | null;
+  /** Deployer/creator when known from provider — never invented. */
+  deployer?: string | null;
   abi?: unknown[] | null;
   sourceCode?: string | null;
   flags?: {

@@ -1,4 +1,5 @@
 import type { Finding } from "@/lib/types";
+import { recommendationForFinding } from "@/lib/engine/recommendations";
 
 function severityClass(s: Finding["severity"]) {
   switch (s) {
@@ -31,34 +32,46 @@ export function FindingsList({
         <p className="mt-3 text-sm text-slate-500">{empty}</p>
       ) : (
         <ul className="mt-4 space-y-3">
-          {findings.map((f) => (
-            <li
-              key={f.id}
-              className={`min-w-0 overflow-hidden rounded-xl border p-3.5 sm:p-3 ${severityClass(f.severity)}`}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <p className="min-w-0 break-words text-[15px] font-medium leading-snug text-white sm:text-base">
-                  {f.title}
-                </p>
-                <span className="shrink-0 rounded-full border border-current/20 px-2 py-0.5 text-[10px] uppercase tracking-wider opacity-80">
-                  {f.severity}
-                </span>
-              </div>
-              <p className="mt-1.5 break-words text-sm leading-relaxed text-slate-300">
-                {f.description}
-              </p>
-              <div className="mt-2 min-w-0 space-y-1">
-                {f.evidence.map((e, i) => (
-                  <p
-                    key={i}
-                    className="break-all font-mono text-[11px] leading-relaxed text-slate-500 [overflow-wrap:anywhere]"
-                  >
-                    evidence: {e.reason} · source: {e.source}
+          {findings.map((f) => {
+            const recommendation =
+              f.severity === "critical" || f.severity === "high"
+                ? recommendationForFinding(f)
+                : undefined;
+            return (
+              <li
+                key={f.id}
+                className={`min-w-0 overflow-hidden rounded-xl border p-3.5 sm:p-3 ${severityClass(f.severity)}`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <p className="min-w-0 break-words text-[15px] font-medium leading-snug text-white sm:text-base">
+                    {f.title}
                   </p>
-                ))}
-              </div>
-            </li>
-          ))}
+                  <span className="shrink-0 rounded-full border border-current/20 px-2 py-0.5 text-[10px] uppercase tracking-wider opacity-80">
+                    {f.severity}
+                  </span>
+                </div>
+                <p className="mt-1.5 break-words text-sm leading-relaxed text-slate-300">
+                  {f.description}
+                </p>
+                {recommendation && (
+                  <p className="mt-2 break-words rounded-lg border border-white/10 bg-ink-950/40 px-2.5 py-2 text-xs leading-relaxed text-slate-200">
+                    <span className="font-medium text-accent-cyan">Recommendation: </span>
+                    {recommendation}
+                  </p>
+                )}
+                <div className="mt-2 min-w-0 space-y-1">
+                  {f.evidence.map((e, i) => (
+                    <p
+                      key={i}
+                      className="break-all font-mono text-[11px] leading-relaxed text-slate-500 [overflow-wrap:anywhere]"
+                    >
+                      evidence: {e.reason} · source: {e.source}
+                    </p>
+                  ))}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

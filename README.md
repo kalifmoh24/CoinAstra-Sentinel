@@ -2,13 +2,13 @@
 
 **Know Before You Sign.** — The security intelligence layer for crypto ([coinastra.io](https://coinastra.io)).
 
-Phase 2: dedicated scanner pages, expanded token/contract/transaction analyzers, mobile-first UX + PWA basics, PostgreSQL.
+Phase 2.5: product depth on scan results — wallet activity timeline, finding recommendations, dangerous-permissions panel, token/contract subject header. Builds on Phase 2 scanners, Postgres, and mobile/PWA basics.
 
 > AI never invents blockchain facts or the risk score. Missing data surfaces as **Insufficient data**. Demo fixtures are labeled **DEMO**. Scores are analytical assessments, not financial/security guarantees. Transaction scanner is **analysis only** — never signs or executes.
 
 ## Architecture
 
-See providers -> risk engine -> AI explanation -> result page.
+data → deterministic risk engine → evidence → AI explanation → result page.
 
 ### Stack
 - Next.js App Router + TypeScript + Tailwind CSS
@@ -50,11 +50,18 @@ With DEMO_MODE=true (or no explorer keys), synthetic fixtures power scans and ar
 
 POST /api/scan accepts type: auto | wallet | token | contract | transaction.
 
+### Phase 2.5 result depth
+
+- **Wallet activity timeline** — when provider/demo fixtures include tx history: date, amount, asset, from, to, risk level, contract interaction
+- **Finding recommendations** — each critical/high finding shows a Recommendation line (engine field or id-mapped)
+- **Dangerous permissions** — dedicated card on token/contract results for mint / pause / upgrade / blacklist / owner privilege findings
+- **Token/contract subject header** — name, symbol, chain, verified, deployer when present in result metadata (no invented facts)
+
 ## Risk engine
 
-- Wallet: age, tx count, high-risk interactions, mixer stub, rapid movement, new contracts, funding source
+- Wallet: age, tx count, high-risk interactions, mixer stub, rapid movement, new contracts, funding source, optional activity rows
 - Token: contract checks plus symbol/decimals/supply, holder breadth, volume/price signals
-- Contract: verified, age, proxy/upgradeable, owner (incl. renounced), mint/pause/blacklist/fee/selfdestruct ABI heuristics, honeypot hook
+- Contract: verified, age, proxy/upgradeable, owner (incl. renounced), mint/pause/blacklist/fee/selfdestruct ABI heuristics, honeypot hook, optional deployer
 - Transaction: analysis-only banner, sensitive methods, approvals, value bands, parties/status evidence
 - Bands: Very Low / Low / Moderate / High / Critical
 - Categories: Security, Contract, Wallet, Liquidity, Ownership, Transaction

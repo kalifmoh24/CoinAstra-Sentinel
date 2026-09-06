@@ -126,9 +126,12 @@ export interface MarketData {
 }
 
 export interface SecurityIntel {
-  sanctionsHit?: boolean;
-  phishingReports?: number;
-  knownMalicious?: boolean;
+  /** true = confirmed hit; false = confirmed clear; null = vendor data unavailable */
+  sanctionsHit?: boolean | null;
+  /** report count when known; null = vendor data unavailable (never invent 0) */
+  phishingReports?: number | null;
+  /** true = confirmed malicious; false = confirmed clear; null = vendor data unavailable */
+  knownMalicious?: boolean | null;
   notes?: string[];
   demo?: boolean;
   sources: string[];

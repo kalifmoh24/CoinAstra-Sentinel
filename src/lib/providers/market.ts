@@ -11,13 +11,46 @@ export const marketProvider: MarketDataProvider = {
     if (isDemoMode()) {
       return { ...DEMO_MARKET, sources: ["DEMO_FIXTURE", `token:${address}`] };
     }
-    // CoinGecko/DexScreener — optional Phase 1+ enrichment
-    return {
-      priceUsd: null,
-      liquidityUsd: null,
-      volume24h: null,
-      demo: false,
-      sources: ["market-provider-insufficient"],
-    };
+    if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
+      return { priceUsd: null, liquidityUsd: null, volume24h: null, demo: false, sources: ["market-invalid-address"] };
+    }
+    try {
+      const res = await fetch(`https://api.coingecko.com/api/v3/coins/ethereum/contract/${address}`, {
+        next: { revalidate: 60 },
+        headers: { accept: "application/json" },
+      });
+      if (!res.ok) {
+        return {
+          priceUsd: null,
+          liquidityUsd: null,
+          volume24h: null,
+          demo: false,
+          sources: ["coingecko-miss"],
+        };
+      }
+      const j = (await res.json()) as {
+        market_data?: {
+          current_price?: { usd?: number };
+          total_volume?: { usd?: number };
+        };
+      };
+      const price = j.market_data?.current_price?.usd ?? null;
+      const volume24h = j.market_data?.total_volume?.usd ?? null;
+      return {
+        priceUsd: price,
+        liquidityUsd: null,
+        volume24h,
+        demo: false,
+        sources: ["coingecko.contract"],
+      };
+    } catch {
+      return {
+        priceUsd: null,
+        liquidityUsd: null,
+        volume24h: null,
+        demo: false,
+        sources: ["coingecko-unavailable"],
+      };
+    }
   },
 };

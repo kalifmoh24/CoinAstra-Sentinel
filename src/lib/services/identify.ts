@@ -1,7 +1,7 @@
 import { detectInputType, isEvmAddress, isTxHash } from "@/lib/detect";
 import { blockchainProvider } from "@/lib/providers";
 import { searchGecko } from "@/lib/live/xray";
-import { normalizeChain } from "@/lib/live/rpc";
+import { erc20Meta, normalizeChain } from "@/lib/live/rpc";
 
 export type IdentifiedKind =
   | "wallet"
@@ -23,6 +23,7 @@ export type IdentifyResult = {
   status: string;
   confidence: "high" | "medium" | "low";
   next: "scan" | "xray" | "none";
+  href: string;
   error?: string;
 };
 
@@ -41,6 +42,7 @@ export async function identifyInput(raw: string, chainHint = "ethereum"): Promis
     status: "Unable to identify this address or transaction.",
     confidence: "low",
     next: "none",
+    href: "/dashboard",
     error,
   });
 
@@ -61,6 +63,7 @@ export async function identifyInput(raw: string, chainHint = "ethereum"): Promis
       status: `${chain} transaction hash detected.`,
       confidence: "high",
       next: "scan",
+      href: "/scan/transaction",
     };
   }
 
@@ -72,6 +75,23 @@ export async function identifyInput(raw: string, chainHint = "ethereum"): Promis
       hasCode = false;
     }
     if (hasCode) {
+      const meta = await erc20Meta(input, chain);
+      if (meta.symbol || meta.decimals != null) {
+        return {
+          kind: "token",
+          chain,
+          input,
+          address: input,
+          hash: null,
+          name: meta.name,
+          symbol: meta.symbol,
+          geckoId: null,
+          status: `${chain} ERC-20 token detected${meta.symbol ? `: ${meta.symbol}` : ""}.`,
+          confidence: "high",
+          next: "scan",
+          href: "/scan/token",
+        };
+      }
       return {
         kind: "contract",
         chain,
@@ -84,6 +104,7 @@ export async function identifyInput(raw: string, chainHint = "ethereum"): Promis
         status: `${chain} contract detected.`,
         confidence: "high",
         next: "scan",
+        href: "/scan/contract",
       };
     }
     return {
@@ -98,6 +119,7 @@ export async function identifyInput(raw: string, chainHint = "ethereum"): Promis
       status: `${chain} wallet detected.`,
       confidence: "high",
       next: "scan",
+      href: "/scan/wallet",
     };
   }
 
@@ -120,8 +142,9 @@ export async function identifyInput(raw: string, chainHint = "ethereum"): Promis
     name: hit.name,
     symbol: hit.symbol,
     geckoId: hit.id,
-    status: `Market asset detected: ${hit.name} (${hit.symbol}). No on-chain scan until a contract is mapped.`,
+    status: `Market asset detected: ${hit.name} (${hit.symbol}).`,
     confidence: "medium",
     next: "xray",
+    href: `/xray?q=${encodeURIComponent(hit.id)}`,
   };
 }

@@ -28,7 +28,8 @@ export type NavIconKey =
   | "plug"
   | "settings"
   | "badgeDollar"
-  | "flaskConical";
+  | "flaskConical"
+  | "scanLine";
 
 export type NavItem = {
   href: string;
@@ -187,6 +188,18 @@ export const NAV_ITEMS: NavItem[] = [
     relatedLabel: "Token Scanner",
     group: "intel",
     icon: "star",
+  },
+  {
+    href: "/xray",
+    label: "X-Ray",
+    shortLabel: "X-Ray",
+    status: "live",
+    description:
+      "Unlock the Coin — public market + contract mapping. Missing layers stay labeled unavailable.",
+    relatedHref: "/scan/token",
+    relatedLabel: "Token Scanner",
+    group: "intel",
+    icon: "scanLine",
   },
   {
     href: "/dex-intelligence",

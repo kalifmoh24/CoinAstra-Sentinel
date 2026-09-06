@@ -90,7 +90,7 @@ export async function deleteWatchItem(ownerKey: string, id: string) {
 }
 
 export async function recordScanAlerts(opts: {
-  ownerKey: string;
+  ownerKey?: string;
   result: ScanResult;
 }) {
   const { ownerKey, result } = opts;
@@ -116,7 +116,7 @@ export async function recordScanAlerts(opts: {
   try {
     await prisma.alertEvent.createMany({
       data: findings.slice(0, 6).map((f) => ({
-        ownerKey,
+        ownerKey: ownerKey ?? null,
         scanId: result.id,
         subject: result.input,
         subjectType: result.inputType,

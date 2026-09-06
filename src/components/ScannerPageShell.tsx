@@ -24,13 +24,13 @@ export function ScannerPageShell({
   bullets: string[];
 }) {
   return (
-    <div className="mx-auto max-w-3xl px-4 pb-28 pt-10 sm:px-6 sm:pb-16 sm:pt-14">
+    <div className="mx-auto max-w-3xl overflow-x-hidden px-4 pb-36 pt-10 sm:px-6 sm:pb-16 sm:pt-14">
       <div className="mb-6 flex flex-wrap gap-2">
         {LINKS.map((l) => (
           <Link
             key={l.href}
             href={l.href}
-            className={`min-h-[40px] rounded-full border px-3.5 py-2 text-sm font-medium transition ${
+            className={`inline-flex min-h-[44px] items-center rounded-full border px-4 py-2.5 text-sm font-medium transition ${
               l.type === type
                 ? "border-accent/50 bg-accent/15 text-accent-cyan"
                 : "border-white/10 bg-ink-900/50 text-slate-400 hover:border-white/20 hover:text-white"

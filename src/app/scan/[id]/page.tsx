@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import type { ScanResult } from "@/lib/types";
-import { ScanResultView } from "@/components/ScanResultView";
+import { ScanResultView, scanTypeHref } from "@/components/ScanResultView";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -20,15 +20,20 @@ export default async function ScanPage({ params }: Props) {
     notFound();
   }
 
+  const newScanHref = scanTypeHref(result.inputType);
+
   return (
     <>
       <div className="border-b border-white/5 bg-ink-900/30">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3 text-sm sm:px-6">
-          <Link href="/" className="min-h-[40px] inline-flex items-center text-accent-cyan hover:underline">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 overflow-x-hidden px-4 py-3 text-sm sm:px-6">
+          <Link
+            href={newScanHref}
+            className="inline-flex min-h-[44px] items-center text-accent-cyan hover:underline"
+          >
             ← New scan
           </Link>
           <span className="text-slate-600">/</span>
-          <span className="font-mono text-slate-400">{id}</span>
+          <span className="break-all font-mono text-slate-400 [overflow-wrap:anywhere]">{id}</span>
         </div>
       </div>
       <ScanResultView result={result} />

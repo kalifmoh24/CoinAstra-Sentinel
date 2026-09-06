@@ -17,22 +17,22 @@ export function Nav() {
             </span>
           </Link>
           <nav className="hidden items-center gap-1 text-sm text-slate-400 md:flex">
-            <Link href="/scan/wallet" className="rounded-lg px-2.5 py-2 hover:bg-white/5 hover:text-white">
+            <Link href="/scan/wallet" className="inline-flex min-h-[44px] items-center rounded-lg px-2.5 py-2 hover:bg-white/5 hover:text-white">
               Wallet
             </Link>
-            <Link href="/scan/token" className="rounded-lg px-2.5 py-2 hover:bg-white/5 hover:text-white">
+            <Link href="/scan/token" className="inline-flex min-h-[44px] items-center rounded-lg px-2.5 py-2 hover:bg-white/5 hover:text-white">
               Token
             </Link>
-            <Link href="/scan/contract" className="rounded-lg px-2.5 py-2 hover:bg-white/5 hover:text-white">
+            <Link href="/scan/contract" className="inline-flex min-h-[44px] items-center rounded-lg px-2.5 py-2 hover:bg-white/5 hover:text-white">
               Contract
             </Link>
             <Link
               href="/scan/transaction"
-              className="rounded-lg px-2.5 py-2 hover:bg-white/5 hover:text-white"
+              className="inline-flex min-h-[44px] items-center rounded-lg px-2.5 py-2 hover:bg-white/5 hover:text-white"
             >
               Tx
             </Link>
-            <Link href="/pricing" className="rounded-lg px-2.5 py-2 hover:bg-white/5 hover:text-white">
+            <Link href="/pricing" className="inline-flex min-h-[44px] items-center rounded-lg px-2.5 py-2 hover:bg-white/5 hover:text-white">
               Pricing
             </Link>
           </nav>
@@ -43,7 +43,7 @@ export function Nav() {
           </span>
           <Link
             href="/pricing"
-            className="min-h-[40px] rounded-md bg-accent/90 px-3 py-2 font-medium text-white transition-colors hover:bg-accent md:hidden"
+            className="inline-flex min-h-[44px] items-center rounded-md bg-accent/90 px-3 py-2 font-medium text-white transition-colors hover:bg-accent md:hidden"
           >
             Pricing
           </Link>

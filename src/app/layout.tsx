@@ -57,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Nav />
         <main className="pb-20 sm:pb-0">{children}</main>
         <footer className="mb-16 border-t border-white/5 py-8 text-center text-xs text-slate-600 sm:mb-0">
-          © {new Date().getFullYear()} CoinAstra · Sentinel Phase 2 · coinastra.io
+          © {new Date().getFullYear()} CoinAstra platform · Sentinel security engine · coinastra.io
         </footer>
         <BottomNav />
       </body>

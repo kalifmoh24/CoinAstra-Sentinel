@@ -37,18 +37,44 @@ With DEMO_MODE=true (or no explorer keys), synthetic fixtures power scans and ar
 
 ## Product surface
 
-- / — Homepage + universal search + quick links
-- /scan/wallet (alias /wallet) — Wallet scanner UX
-- /scan/token — Token security scanner
-- /scan/contract — Smart contract scanner
-- /scan/transaction — Tx preview / analysis (never executes)
-- /scan/[id] — Full result page
-- /pricing — Free / Pro / Business stub (no payments)
-- POST /api/scan — Validate, rate-limit, optional type param, engine, AI, persist
-- GET /api/v1/{wallet,token,contract,transaction}/[id] — API stubs
-- /manifest.webmanifest — PWA manifest
+### Locked nav map (CoinAstra IA)
 
-POST /api/scan accepts type: auto | wallet | token | contract | transaction.
+| Nav label | Route | Status |
+|-----------|-------|--------|
+| Dashboard | `/dashboard` | Beta stub |
+| Markets | `/markets` | Coming soon |
+| Portfolio | `/portfolio` | Coming soon |
+| AI Intelligence | `/ai-intelligence` | Beta stub |
+| Wallet Scanner | `/scan/wallet` (alias `/wallet`) | Live |
+| Token Scanner | `/scan/token` | Live |
+| Contract Scanner | `/scan/contract` | Live |
+| Transaction Preview | `/scan/transaction` | Live |
+| Risk Intel | `/risk-intel` | Beta stub |
+| Alerts | `/alerts` | Coming soon |
+| Watchlist | `/watchlist` | Coming soon |
+| Exposure Checker | `/exposure-checker` | Beta stub |
+| AI Security Analyst | `/ai-security-analyst` | Beta stub |
+| Transaction Simulator | `/transaction-simulator` | Coming soon |
+| Approval Checker | `/approval-checker` | Beta stub |
+| AI Agent Firewall | `/ai-agent-firewall` | Coming soon |
+| DEX Intelligence | `/dex-intelligence` | Coming soon |
+| Launchpad Intelligence | `/launchpad-intelligence` | Coming soon |
+| API / Integrations | `/api-integrations` | Beta stub |
+
+Desktop: primary scanners + Dashboard/Risk Intel in the top bar; **More** opens the full IA drawer. Mobile: bottom bar (Dashboard, Wallet, Token, Tx, **More**) with the same full route list.
+
+### Other routes
+
+- `/` — Homepage + universal search + quick links
+- `/scan/[id]` — Full result page
+- `/pricing` — Free / Pro / Business stub (no payments) + “We don’t do this” strip
+- `POST /api/scan` — Validate, rate-limit, optional type param, engine, AI, persist
+- `GET /api/v1/{wallet,token,contract,transaction}/[id]` — API stubs
+- `/manifest.webmanifest` — PWA manifest
+
+`POST /api/scan` accepts `type: auto | wallet | token | contract | transaction`.
+
+**Brand:** CoinAstra is the platform; Sentinel is the security engine. No AI BTC candle predictions / no generic signal spam. DEMO labels and disclaimers stay.
 
 ### Phase 2.5 result depth
 
@@ -70,7 +96,7 @@ POST /api/scan accepts type: auto | wallet | token | contract | transaction.
 ## Mobile and PWA
 
 - Larger tap targets, sticky scan CTA above bottom nav, safe-area insets
-- Bottom-friendly primary nav on small screens
+- Bottom-friendly primary nav + More drawer listing all locked IA routes
 - Responsive result cards
 - Web manifest + icons + theme-color for Add to Home Screen (not a native store app)
 

@@ -39,7 +39,8 @@ export default function PricingPage() {
           Simple tiers. Payments later.
         </h1>
         <p className="mt-3 text-slate-400">
-          Phase 1 ships a Free tier stub (5 scans/day via cookie/IP). Pro and Business are placeholders — no payments yet.
+          CoinAstra platform · Sentinel security engine. Free tier stub (5 scans/day via cookie/IP).
+          Pro and Business are placeholders — no payments yet.
         </p>
       </div>
       <div className="mt-12 grid gap-6 lg:grid-cols-3">
@@ -75,6 +76,17 @@ export default function PricingPage() {
             </Link>
           </div>
         ))}
+      </div>
+
+      <div className="mx-auto mt-14 max-w-2xl rounded-2xl border border-white/10 bg-ink-900/40 p-6 text-center">
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">We don&apos;t do this</p>
+        <p className="mt-3 text-sm text-slate-300">
+          No AI BTC candle predictions. No generic signal spam. No invented prices or &quot;buy now&quot; tips.
+        </p>
+        <p className="mt-2 text-sm text-slate-500">
+          CoinAstra is a research and security platform. Sentinel scores risk from evidence — DEMO
+          fixtures stay labeled DEMO, and missing data is Insufficient data.
+        </p>
       </div>
     </div>
   );

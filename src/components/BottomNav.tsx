@@ -29,12 +29,12 @@ export function BottomNav() {
                 <Link
                   href={item.href}
                   className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-1.5 text-[10px] font-medium transition ${
-                    active ? "text-accent-purple" : "text-slate-500 hover:text-slate-300"
+                    active ? "text-accent" : "text-slate-500 hover:text-slate-300"
                   }`}
                 >
                   <span
                     className={`flex h-7 w-7 items-center justify-center rounded-md ${
-                      active ? "bg-accent/20 text-accent" : "bg-ink-800/80 text-slate-400"
+                      active ? "bg-accent/25 text-accent" : "bg-transparent text-slate-400"
                     }`}
                   >
                     <NavIcon name={item.icon} className="h-4 w-4" />

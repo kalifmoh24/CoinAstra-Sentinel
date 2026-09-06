@@ -21,21 +21,27 @@ export function ScanResultTabs({ result }: { result: ScanResult }) {
 
   return (
     <div className="min-w-0 space-y-4">
-      <div className="flex gap-1 border-b border-white/5">
+      <div
+        className="flex gap-1 rounded-full border border-white/5 bg-ink-950/70 p-1"
+        role="tablist"
+        aria-label="Scan result sections"
+      >
         {TABS.map((t) => (
           <button
             key={t}
             type="button"
+            role="tab"
+            aria-selected={tab === t}
             onClick={() => setTab(t)}
-            className={`min-h-[40px] flex-1 px-3 text-sm font-medium transition ${
+            className={`min-h-[36px] flex-1 rounded-full px-3 text-sm font-medium transition ${
               tab === t
-                ? "border-b-2 border-accent-purple text-accent-purple"
-                : "border-b-2 border-transparent text-slate-400 hover:text-white"
+                ? "bg-accent text-white shadow-glow"
+                : "text-slate-400 hover:bg-white/5 hover:text-white"
             }`}
           >
             {t}
             {t === "Activity" && !hasActivity ? (
-              <span className="ml-1 text-[10px] text-slate-600">—</span>
+              <span className="ml-1 text-[10px] text-slate-500">—</span>
             ) : null}
           </button>
         ))}

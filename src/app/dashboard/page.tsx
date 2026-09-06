@@ -32,36 +32,52 @@ export const metadata: Metadata = {
 const DEMO_STATS = [
   {
     label: "Scans Performed",
+    mobileLabel: "Scans",
     value: "24",
     delta: "+20% from last 7 days",
+    mobileDelta: "↑ 20%",
     up: true,
     color: "#38bdf8",
     spark: [8, 10, 9, 14, 12, 16, 18, 20, 22, 24],
   },
   {
     label: "High Risk Detected",
+    mobileLabel: "High Risk",
     value: "7",
     delta: "↑ 16% from last 7 days",
+    mobileDelta: "↑ 16%",
     up: false,
     color: "#f43f5e",
     spark: [3, 4, 3, 5, 6, 5, 7, 6, 7, 7],
   },
   {
     label: "Assets Monitored",
+    mobileLabel: "Monitored",
     value: "18",
     delta: "↑ 8% from last 7 days",
+    mobileDelta: "↑ 8%",
     up: true,
     color: "#34d399",
     spark: [10, 11, 12, 13, 14, 15, 16, 16, 17, 18],
   },
   {
     label: "Alerts Triggered",
+    mobileLabel: "Alerts",
     value: "12",
     delta: "↑ 33% from last 7 days",
+    mobileDelta: "↑ 33%",
     up: false,
     color: "#fb923c",
     spark: [4, 5, 6, 5, 7, 8, 9, 10, 11, 12],
   },
+];
+
+/** Mobile overview order matches mockup: Scans, Alerts, High Risk, Monitored */
+const DEMO_STATS_MOBILE = [
+  DEMO_STATS[0], // Scans
+  DEMO_STATS[3], // Alerts
+  DEMO_STATS[1], // High Risk
+  DEMO_STATS[2], // Monitored
 ];
 
 const DEMO_CATEGORIES: CategoryScore[] = [
@@ -217,29 +233,29 @@ export default function DashboardPage() {
       {/* ——— Mobile denser stack ——— */}
       <section className="space-y-4 lg:hidden" aria-label="Mobile dashboard">
         <div className="card-glow p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-semibold text-white">Quick Scan</p>
-              <p className="text-[11px] text-slate-500">Powered by Sentinel AI</p>
+          {/* P-PIXEL-001: title + shield side-by-side, action grid below */}
+          <div className="flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-base font-semibold text-white">Quick Scan</p>
+              <p className="mt-0.5 text-[11px] text-slate-500">Powered by Sentinel AI</p>
             </div>
-          </div>
-          <div className="mt-4 flex justify-center">
-            <HeroShield className="h-28" />
+            <HeroShield className="h-20 w-auto shrink-0 sm:h-24" />
           </div>
           <div className="mt-4 grid grid-cols-4 gap-2">
             {QUICK_SCAN.map((t) => (
               <Link
                 key={t.href}
                 href={t.href}
-                className={`flex min-h-[72px] flex-col items-center justify-center gap-1.5 rounded-xl border px-1 text-center text-[11px] font-semibold ${t.color}`}
+                className="flex min-h-[76px] flex-col items-center justify-center gap-1.5 rounded-xl border border-white/5 bg-ink-950/50 px-1 text-center transition hover:border-accent/30"
               >
-                <t.Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
-                {t.label}
+                <span
+                  className={`inline-flex h-9 w-9 items-center justify-center rounded-lg border ${t.color}`}
+                >
+                  <t.Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                </span>
+                <span className="text-[11px] font-semibold text-slate-200">{t.label}</span>
               </Link>
             ))}
-          </div>
-          <div className="mt-3">
-            <SearchBox />
           </div>
         </div>
 
@@ -249,15 +265,15 @@ export default function DashboardPage() {
             <span className="text-[10px] text-amber-300/80">DEMO</span>
           </div>
           <div className="grid grid-cols-2 gap-2.5">
-            {DEMO_STATS.map((s) => (
-              <div key={s.label} className="card-surface p-3">
-                <p className="text-[10px] uppercase tracking-wider text-slate-500">{s.label.split(" ")[0]}</p>
+            {DEMO_STATS_MOBILE.map((s) => (
+              <div key={s.mobileLabel} className="card-surface p-3">
+                <p className="text-[10px] uppercase tracking-wider text-slate-500">{s.mobileLabel}</p>
                 <div className="mt-1 flex items-end justify-between gap-2">
                   <p className="text-xl font-semibold tabular-nums text-white">{s.value}</p>
                   <Sparkline points={s.spark} color={s.color} width={56} height={22} />
                 </div>
                 <p className={`mt-1 text-[11px] ${s.up ? "text-accent-emerald" : "text-risk-high"}`}>
-                  {s.delta.split(" ")[0]} <span className="text-slate-600">DEMO</span>
+                  {s.mobileDelta} <span className="text-slate-600">DEMO</span>
                 </p>
               </div>
             ))}

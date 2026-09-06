@@ -7,6 +7,7 @@ import { FindingsList } from "./FindingsList";
 import { AiExplanation } from "./AiExplanation";
 import { WalletActivityTimeline } from "./WalletActivityTimeline";
 import { DangerousPermissions } from "./DangerousPermissions";
+import { RiskRadar } from "./RiskRadar";
 
 const TABS = ["Summary", "Findings", "Activity"] as const;
 type Tab = (typeof TABS)[number];
@@ -42,6 +43,22 @@ export function ScanResultTabs({ result }: { result: ScanResult }) {
 
       {tab === "Summary" && (
         <div className="space-y-4">
+          {result.categories && result.categories.length > 0 ? (
+            <div className="overflow-x-hidden rounded-2xl border border-white/5 bg-ink-900/50 p-5">
+              <h2 className="text-sm font-medium text-slate-300">Risk radar</h2>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+                Category risk profile from the same structured evidence as the score panel —
+                visible here so wallet Summary stays clear on mobile.
+              </p>
+              <div className="mt-3 flex justify-center">
+                <RiskRadar
+                  categories={result.categories}
+                  band={result.band}
+                  size={220}
+                />
+              </div>
+            </div>
+          ) : null}
           <CategoryBreakdown categories={result.categories} />
           <AiExplanation text={result.aiExplanation} demo={result.demo} />
           {showDangerous && <DangerousPermissions findings={result.findings} />}

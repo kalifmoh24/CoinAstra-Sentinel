@@ -168,19 +168,21 @@ export const NAV_ITEMS: NavItem[] = [
   {
     href: "/alerts",
     label: "Alerts",
-    status: "soon",
-    description: "Monitoring and alert rules for watched addresses and contracts — scaffolding only for now.",
+    status: "beta",
+    description:
+      "Risk-change and allowance alerts for watched subjects. DEMO fixtures labeled — not a live mempool feed.",
     relatedHref: "/watchlist",
     relatedLabel: "Watchlist",
     group: "intel",
     icon: "bell",
-    badgeDemo: 8,
+    badgeDemo: 6,
   },
   {
     href: "/watchlist",
     label: "Watchlist",
-    status: "soon",
-    description: "Save wallets, tokens, and contracts to revisit. No fake price ticks or signal spam.",
+    status: "beta",
+    description:
+      "Watched wallets, tokens, and contracts with last engine score. DEMO labeled. No fake price ticks.",
     relatedHref: "/scan/token",
     relatedLabel: "Token Scanner",
     group: "intel",
@@ -314,7 +316,7 @@ export const BOTTOM_PRIMARY = [
 
 export function statusLabel(status: NavStatus): string {
   if (status === "live") return "Live";
-  if (status === "beta") return "Beta stub";
+  if (status === "beta") return "Beta";
   return "Coming soon";
 }
 

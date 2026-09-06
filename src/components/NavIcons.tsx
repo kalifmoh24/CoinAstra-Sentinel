@@ -41,7 +41,7 @@ import {
 } from "lucide-react";
 import type { NavIconKey } from "@/lib/nav";
 
-const MAP: Record<NavIconKey, LucideIcon> = {
+const MAP: Record<string, LucideIcon> = {
   home: Home,
   wallet: Wallet,
   coins: Coins,

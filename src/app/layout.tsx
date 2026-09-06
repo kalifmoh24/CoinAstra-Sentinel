@@ -42,8 +42,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#05070d" },
-    { media: "(prefers-color-scheme: light)", color: "#05070d" },
+    { media: "(prefers-color-scheme: dark)", color: "#030712" },
+    { media: "(prefers-color-scheme: light)", color: "#030712" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -56,21 +56,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen overflow-x-hidden font-sans">
         <AppShell>
           <main className="pb-20 lg:pb-0">{children}</main>
-          <footer className="mb-16 border-t border-white/5 px-4 py-6 text-xs text-slate-600 lg:mb-0 sm:px-6">
-            <div className="mx-auto flex max-w-7xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p>© {new Date().getFullYear()} CoinAstra · Sentinel security engine</p>
-              <div className="flex flex-wrap gap-3">
-                <a href="/api-integrations" className="hover:text-slate-400">
+          <footer className="mb-16 border-t border-white/5 px-4 py-5 text-xs text-slate-500 lg:mb-0 sm:px-6">
+            <div className="mx-auto flex max-w-7xl flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <p className="text-slate-500">CoinAstra Sentinel © 2025</p>
+              <p className="order-first text-center text-slate-600 lg:order-none">
+                Security Intelligence for Crypto
+              </p>
+              <div className="flex flex-wrap gap-3 lg:justify-end">
+                <a href="/api-integrations" className="hover:text-slate-300">
                   Documentation
                 </a>
-                <a href="/api-integrations" className="hover:text-slate-400">
+                <a href="/api-integrations" className="hover:text-slate-300">
                   API
                 </a>
-                <a href="/pricing" className="hover:text-slate-400">
+                <a href="/pricing" className="hover:text-slate-300">
                   Support
                 </a>
-                <span className="text-slate-700">Privacy</span>
-                <span className="text-slate-700">Terms</span>
+                <span className="text-slate-600">Privacy</span>
+                <span className="text-slate-600">Terms</span>
               </div>
             </div>
           </footer>

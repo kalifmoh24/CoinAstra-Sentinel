@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { NAV_GROUPS, NAV_ITEMS, statusLabel, type NavStatus } from "@/lib/nav";
+import { NavIcon } from "./NavIcons";
 
 function badgeClass(status: NavStatus) {
   if (status === "live") return "text-accent-emerald";
@@ -79,8 +80,12 @@ export function MoreMenu({ open, onClose }: { open: boolean; onClose: () => void
                               : "text-slate-300 hover:bg-white/5 hover:text-white"
                           }`}
                         >
-                          <span className="flex items-center gap-2">
-                            {item.label}
+                          <span className="flex min-w-0 items-center gap-2.5">
+                            <NavIcon
+                              name={item.icon}
+                              className={`h-4 w-4 shrink-0 ${active ? "text-accent-purple" : "text-slate-500"}`}
+                            />
+                            <span className="truncate">{item.label}</span>
                             {item.badgeDemo != null && (
                               <span className="rounded-full bg-risk-critical px-1.5 py-0.5 text-[9px] font-bold text-white">
                                 {item.badgeDemo}

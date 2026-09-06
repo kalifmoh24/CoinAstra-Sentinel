@@ -21,16 +21,16 @@ export function ScanResultTabs({ result }: { result: ScanResult }) {
 
   return (
     <div className="min-w-0 space-y-4">
-      <div className="flex gap-1 rounded-xl border border-white/5 bg-ink-900/50 p-1">
+      <div className="flex gap-1 border-b border-white/5">
         {TABS.map((t) => (
           <button
             key={t}
             type="button"
             onClick={() => setTab(t)}
-            className={`min-h-[40px] flex-1 rounded-lg px-3 text-sm font-medium transition ${
+            className={`min-h-[40px] flex-1 px-3 text-sm font-medium transition ${
               tab === t
-                ? "bg-accent/20 text-accent-purple"
-                : "text-slate-400 hover:text-white"
+                ? "border-b-2 border-accent-purple text-accent-purple"
+                : "border-b-2 border-transparent text-slate-400 hover:text-white"
             }`}
           >
             {t}

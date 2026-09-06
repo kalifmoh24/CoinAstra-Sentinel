@@ -117,8 +117,36 @@ export async function loadXray(query: string): Promise<XrayReport | null> {
   if (!res.ok) return null;
   const c = (await res.json()) as GeckoCoin;
   const md = c.market_data;
-  const contract = c.platforms?.ethereum || c.platforms?.base || null;
-  const chain = c.platforms?.ethereum ? "ethereum" : Object.keys(c.platforms ?? {})[0] || "unknown";
+  const evmPlatform =
+    c.platforms?.ethereum ||
+    c.platforms?.base ||
+    c.platforms?.["polygon-pos"] ||
+    c.platforms?.["arbitrum-one"] ||
+    c.platforms?.["binance-smart-chain"] ||
+    null;
+  const contract = evmPlatform && /^0x[a-fA-F0-9]{40}$/.test(evmPlatform) ? evmPlatform : evmPlatform || null;
+  const chain = c.platforms?.ethereum
+    ? "ethereum"
+    : c.platforms?.base
+      ? "base"
+      : c.platforms?.["polygon-pos"]
+        ? "polygon"
+        : c.platforms?.["arbitrum-one"]
+          ? "arbitrum"
+          : c.platforms?.["binance-smart-chain"]
+            ? "bsc"
+            : Object.keys(c.platforms ?? {})[0] || "unknown";
+
+  let codeHex: string | null = null;
+  let erc20: { symbol: string | null; decimals: number | null; name: string | null } | null = null;
+  const rpcChain = ["ethereum", "base", "polygon", "arbitrum", "bsc"].includes(chain) ? chain : null;
+  if (contract && /^0x[a-fA-F0-9]{40}$/.test(contract) && rpcChain) {
+    const { ethGetCode, erc20Meta } = await import("./rpc");
+    codeHex = await ethGetCode(contract, rpcChain);
+    if (codeHex && codeHex !== "0x") {
+      erc20 = await erc20Meta(contract, rpcChain);
+    }
+  }
 
   const circ = md?.circulating_supply ?? null;
   const total = md?.total_supply ?? null;
@@ -136,17 +164,34 @@ export async function loadXray(query: string): Promise<XrayReport | null> {
       : clamp(70 - Math.min(40, Math.abs(md.price_change_percentage_24h)));
   const onchain = vol == null ? null : clamp(Math.min(90, 40 + Math.log10(Math.max(vol, 1)) * 6));
   const ecosystem = mcap == null ? null : clamp(Math.min(92, 35 + Math.log10(Math.max(mcap, 1)) * 5));
-  const security = contract ? 55 : null;
+  const hasCode = Boolean(codeHex && codeHex !== "0x");
+  const security = !contract
+    ? null
+    : !rpcChain
+      ? 50
+      : codeHex == null
+        ? null
+        : hasCode
+          ? erc20?.symbol
+            ? 68
+            : 58
+          : 18;
 
   const dims: XrayDim[] = [
     {
       key: "security",
       label: "Security",
       score: security,
-      confidence: contract ? "medium" : "low",
-      note: contract
-        ? "Contract address present — run Token Scanner for ABI/owner evidence."
-        : "No EVM contract on this listing. Security score withheld.",
+      confidence: hasCode ? "medium" : "low",
+      note: !contract
+        ? "No EVM contract on this listing. Security score withheld."
+        : codeHex == null
+          ? "Contract mapped, but RPC bytecode lookup was unavailable."
+          : hasCode
+            ? erc20?.symbol
+              ? `On-chain code present; ERC-20 symbol ${erc20.symbol}. Privileges still need Token Scanner.`
+              : "On-chain code present. ERC-20 metadata did not decode — run Token Scanner."
+            : "Mapped address returned empty bytecode on the public RPC.",
     },
     {
       key: "tokenomics",
@@ -202,8 +247,32 @@ export async function loadXray(query: string): Promise<XrayReport | null> {
     findings.push({
       severity: "info",
       title: "EVM contract mapped",
-      evidence: contract,
+      evidence: `${chain} ${contract}`,
       source: "coingecko.platforms",
+    });
+  }
+  if (contract && rpcChain && codeHex == null) {
+    findings.push({
+      severity: "info",
+      title: "Bytecode lookup unavailable",
+      evidence: "Public RPC did not return eth_getCode. Security score withheld.",
+      source: "public-rpc",
+    });
+  }
+  if (contract && rpcChain && codeHex === "0x") {
+    findings.push({
+      severity: "critical",
+      title: "No contract bytecode",
+      evidence: `${contract} returned empty code on ${rpcChain}`,
+      source: "public-rpc.eth_getCode",
+    });
+  }
+  if (hasCode && erc20?.symbol) {
+    findings.push({
+      severity: "positive",
+      title: "ERC-20 interface responds",
+      evidence: `${erc20.name ?? "token"} (${erc20.symbol})${erc20.decimals != null ? `, ${erc20.decimals} decimals` : ""}`,
+      source: "public-rpc.erc20",
     });
   }
   if (circRatio != null && circRatio < 0.25) {
@@ -233,6 +302,7 @@ export async function loadXray(query: string): Promise<XrayReport | null> {
 
   const missing: string[] = [];
   if (!contract) missing.push("Verified EVM contract / ABI privileges");
+  if (codeHex == null && contract) missing.push("Live bytecode (RPC miss)");
   missing.push("Unlock / vesting calendar");
   missing.push("Holder concentration & whale clustering");
   missing.push("DEX pool depth / LP lock");
@@ -263,7 +333,7 @@ export async function loadXray(query: string): Promise<XrayReport | null> {
     strengths: findings.filter((f) => f.severity === "positive" || f.severity === "info").map((f) => f.title),
     risks: findings.filter((f) => f.severity === "high" || f.severity === "critical" || f.severity === "moderate").map((f) => f.title),
     missing,
-    sources: ["coingecko"],
+    sources: hasCode || codeHex != null ? ["coingecko", "public-rpc"] : ["coingecko"],
     updatedAt: new Date().toISOString(),
   };
 }

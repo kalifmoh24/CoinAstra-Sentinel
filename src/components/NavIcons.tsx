@@ -65,6 +65,7 @@ const MAP: Record<NavIconKey, LucideIcon> = {
   settings: Settings,
   badgeDollar: BadgeDollarSign,
   flaskConical: FlaskConical,
+  scanLine: ScanLine,
 };
 
 export function NavIcon({

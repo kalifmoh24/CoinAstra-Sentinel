@@ -25,6 +25,12 @@ const CARDS = [
     desc: "Method & value analysis — never executes.",
     badge: "Preview",
   },
+  {
+    href: "/xray",
+    title: "Unlock the Coin",
+    desc: "X-Ray market + contract mapping. Gaps stay labeled.",
+    badge: "X-Ray",
+  },
 ];
 
 export function QuickScanLinks() {
@@ -39,7 +45,7 @@ export function QuickScanLinks() {
         </div>
         <p className="hidden text-xs text-slate-500 sm:block">Or use universal search above</p>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {CARDS.map((c) => (
           <Link
             key={c.href}

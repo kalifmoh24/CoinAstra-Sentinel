@@ -77,7 +77,22 @@ Full multi-chain live data, monitoring/alerts, payments, browser extension, tran
 
 ## Deploy
 
-Connect the GitHub repo to Vercel, set env vars (Postgres DATABASE_URL required, e.g. Neon), deploy, then push/migrate the Prisma schema against production.
+**Vercel project name:** `coinastra-sentinel` (link `kalifmoh24/CoinAstra-Sentinel`).
+
+### Ops checklist
+1. Link the GitHub repo in Vercel (GitHub app must have access as `kalifmoh24`).
+2. Set environment variables (Production / Preview as needed):
+   - `DEMO_MODE` — `false` in production; `true` ok for preview soft-launch
+   - `ETHERSCAN_API_KEY`, `ALCHEMY_API_KEY` — server-only (never `NEXT_PUBLIC_*`)
+   - `OPENAI_API_KEY` — optional, server-only
+   - `DATABASE_URL` — PostgreSQL URL (Neon or Vercel Postgres); required
+   - `NEXT_PUBLIC_APP_URL` — `https://coinastra.io` in production
+3. Provision Postgres, then run `npx prisma db push` (or migrate) against that `DATABASE_URL`.
+4. Deploy from `main`. Build runs `prisma generate && next build`.
+5. Add custom domain `coinastra.io` (+ `www` if desired) and apply the DNS records Vercel shows.
+6. Smoke: homepage, a scan (live or labeled DEMO), persistence, no API keys in the client bundle.
+
+Local/dev uses the same PostgreSQL provider (Neon free tier or Docker). SQLite is no longer supported.
 
 ## License
 

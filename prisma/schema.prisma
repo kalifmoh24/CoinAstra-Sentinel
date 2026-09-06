@@ -1,5 +1,4 @@
 // CoinAstra Sentinel — Prisma schema (PostgreSQL)
-// Local/dev: Neon free tier or Docker Postgres. DEMO_MODE fixtures still power scans.
 
 generator client {
   provider = "prisma-client-js"
@@ -24,6 +23,11 @@ model Scan {
   resultJson  String
   clientIp    String?
   userAgent   String?
+  ownerKey    String?
+
+  @@index([createdAt])
+  @@index([ownerKey])
+  @@index([input, inputType])
 }
 
 model RateLimitBucket {
@@ -34,4 +38,40 @@ model RateLimitBucket {
   updatedAt DateTime @updatedAt
 
   @@unique([key, day])
+}
+
+model WatchItem {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  ownerKey    String
+  subject     String
+  subjectType String
+  chain       String   @default("ethereum")
+  label       String?
+  lastScore   Int?
+  lastBand    String?
+  lastScanId  String?
+  note        String?
+
+  @@unique([ownerKey, subject, subjectType, chain])
+  @@index([ownerKey])
+}
+
+model AlertEvent {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  ownerKey       String?
+  scanId         String?
+  subject        String
+  subjectType    String
+  severity       String
+  title          String
+  description    String
+  evidence       String
+  recommendation String?
+  href           String
+
+  @@index([createdAt])
+  @@index([ownerKey])
 }

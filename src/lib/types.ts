@@ -98,6 +98,36 @@ export interface ScanResult {
     balanceEth?: number | null;
     labels?: string[];
   };
+  /** Structured ERC-20 approvals when evaluated (null/omit = not evaluated). */
+  approvals?: TokenApproval[] | null;
+  /** Structured holdings when evaluated (null/omit = not evaluated). */
+  holdings?: WalletHolding[] | null;
+}
+
+
+export interface TokenApproval {
+  token: string;
+  spender: string;
+  /** Human-readable allowance when known; null = Insufficient data (never invent 0/unlimited) */
+  allowance: string | null;
+  allowanceRaw?: string | null;
+  unlimited: boolean;
+  lastSeen?: string | null;
+  evidence: Evidence[];
+  sources: string[];
+  demo?: boolean;
+}
+
+export interface WalletHolding {
+  token: string;
+  symbol?: string | null;
+  decimals?: number | null;
+  /** Human-readable balance when known; omit/null when unknown — never invent balances */
+  balance: string | null;
+  balanceRaw?: string | null;
+  evidence: Evidence[];
+  sources: string[];
+  demo?: boolean;
 }
 
 export interface WalletData {
@@ -117,6 +147,10 @@ export interface WalletData {
   mixerExposure?: boolean | null;
   /** Recent activity rows when tx history is available. */
   activity?: WalletActivityItem[];
+  /** null = not evaluated; [] = evaluated empty only when provider truly returned empty */
+  approvals?: TokenApproval[] | null;
+  /** null = not evaluated; [] = evaluated empty only when provider truly returned empty */
+  holdings?: WalletHolding[] | null;
   demo?: boolean;
   sources: string[];
 }

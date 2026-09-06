@@ -2,10 +2,12 @@ import type {
   ContractData,
   MarketData,
   SecurityIntel,
+  TokenApproval,
   TokenData,
   TransactionData,
   WalletActivityItem,
   WalletData,
+  WalletHolding,
 } from "../types";
 
 /** DEMO fixtures — clearly labeled; used when DEMO_MODE or API keys missing. */
@@ -57,6 +59,67 @@ export const DEMO_WALLET_ACTIVITY: WalletActivityItem[] = [
   },
 ];
 
+
+export const DEMO_APPROVALS: TokenApproval[] = [
+  {
+    token: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    spender: "0x1111111254EEB25477B68fb85Ed929f73A960582",
+    allowance: "unlimited",
+    allowanceRaw: "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+    unlimited: true,
+    lastSeen: "2024-11-02T15:22:11.000Z",
+    evidence: [
+      {
+        reason: "DEMO fixture unlimited USDC allowance to aggregation router",
+        source: "DEMO_FIXTURE",
+        raw: { method: "approve" },
+      },
+    ],
+    sources: ["DEMO_FIXTURE"],
+    demo: true,
+  },
+  {
+    token: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    spender: "0xDemoMixerStub000000000000000000000001",
+    allowance: "500000",
+    allowanceRaw: "500000000000",
+    unlimited: false,
+    lastSeen: "2024-09-01T14:05:33.000Z",
+    evidence: [
+      {
+        reason: "DEMO fixture allowance to mixer-like stub spender",
+        source: "DEMO_FIXTURE",
+        raw: { risk: "high" },
+      },
+    ],
+    sources: ["DEMO_FIXTURE"],
+    demo: true,
+  },
+];
+
+export const DEMO_HOLDINGS: WalletHolding[] = [
+  {
+    token: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    symbol: "DUSDC",
+    decimals: 6,
+    balance: "125000.00",
+    balanceRaw: "125000000000",
+    evidence: [{ reason: "DEMO fixture token balance", source: "DEMO_FIXTURE" }],
+    sources: ["DEMO_FIXTURE"],
+    demo: true,
+  },
+  {
+    token: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    symbol: "WETH",
+    decimals: 18,
+    balance: "8.50",
+    balanceRaw: "8500000000000000000",
+    evidence: [{ reason: "DEMO fixture token balance", source: "DEMO_FIXTURE" }],
+    sources: ["DEMO_FIXTURE"],
+    demo: true,
+  },
+];
+
 export const DEMO_WALLET: WalletData = {
   address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0",
   chain: "ethereum",
@@ -77,6 +140,8 @@ export const DEMO_WALLET: WalletData = {
   newContractInteractions: 3,
   mixerExposure: true,
   activity: DEMO_WALLET_ACTIVITY,
+  approvals: DEMO_APPROVALS,
+  holdings: DEMO_HOLDINGS,
   demo: true,
   sources: ["DEMO_FIXTURE"],
 };
@@ -156,7 +221,14 @@ export function demoWalletFor(address: string): WalletData {
     from: row.from === DEMO_WALLET.address ? address : row.from,
     to: row.to === DEMO_WALLET.address ? address : row.to,
   }));
-  return { ...DEMO_WALLET, address, activity, demo: true };
+  return {
+    ...DEMO_WALLET,
+    address,
+    activity,
+    approvals: DEMO_APPROVALS.map((a) => ({ ...a, demo: true })),
+    holdings: DEMO_HOLDINGS.map((h) => ({ ...h, demo: true })),
+    demo: true,
+  };
 }
 
 export function demoContractFor(address: string): ContractData {
